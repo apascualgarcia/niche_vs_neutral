@@ -1,0 +1,9 @@
+# Biodiversity and immigration rates parameter medians and confidence intervals
+# Computed with Medians.pl and cat here (ExtractMedians.sh) as standard output
+#LowerConfid(95%) Median UpperConfid(95%)
+600.441799 634.458423 670.080785
+1545.278979 1715.529656 1906.934509
+2117.411404 2387.333334 2707.726751
+2316.247170 2625.696247 2966.414046
+1677.951050 1886.864565 2118.300434
+604.544633 667.056319 738.533668

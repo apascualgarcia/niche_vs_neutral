@@ -1,0 +1,3 @@
+# Biodiversity and immigration rates parameter medians and confidence intervals
+# Computed with Medians.pl and cat here (ExtractMedians.sh) as standard output
+#LowerConfid(95%) Median UpperConfid(95%)

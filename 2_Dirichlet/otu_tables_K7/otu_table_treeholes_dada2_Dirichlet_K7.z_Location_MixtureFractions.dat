@@ -1,0 +1,15 @@
+# >> Output from Mixtures2Metadata.pl <<
+# >> Input file with the samples contribution to the mixture components 
+# >> Input file for samples to taxa matrix: 
+# >> This output file: otu_table_treeholes_dada2_Dirichlet_K7.z_Location_MixtureFractions.dat
+# >> Running at date:  (mm,dd,yy) 9, 14, 2024, and time: 16:28:37,
+# >> Silwood Park, Imperial College London, A.P-G.
+# 
+#South	1	7	CONTROL	3	9	8	West	10	4	2	North	East	6	5	
+MixtComp-1	0	0	0	0	0.42	0.02	0	0	0.26	0.02	0	0	0	0	0.28	
+MixtComp-2	0	0.25	0	0	0	0	0	0	0	0	0.75	0	0	0	0	
+MixtComp-3	0	0	0	0	0	0	0	0	0	1	0	0	0	0	0	
+MixtComp-4	0	0	0	0	0	0	0	0	0	1	0	0	0	0	0	
+MixtComp-5	0	0	0	0	0	0.481481481481481	0.518518518518518	0	0	0	0	0	0	0	0	
+MixtComp-6	0	0	0	0	0	0	0	0	0	0	0	0	0	1	0	
+MixtComp-7	0	0.387096774193548	0.612903225806452	0	0	0	0	0	0	0	0	0	0	0	0	
