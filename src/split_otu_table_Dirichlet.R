@@ -117,5 +117,5 @@ write.table(otu.pseq.rar@.Data, file = file.out, quote = F, sep = ",",col.names 
 
 # --- Write new metadata table
 setwd(dirMeta)
-file.out = "Metadata_singleTree_wDirich.tsv"
+file.out = paste0(file.meta.label,"_wDirich-K",Ncomp,".tsv")
 write.table(df.meta,file = file.out, quote = F, sep = "\t", row.names = F)
