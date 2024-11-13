@@ -4,3 +4,5 @@
 .Ruserdata
 .DS_Store
 launch.json
+.pyc
+__pycache__
