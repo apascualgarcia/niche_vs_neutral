@@ -1,12 +1,15 @@
 source("src/immigration_rates.R")
 
 library(here)
-library(phyloseq)
-library(Biostrings)
-library(ape)
-library(zCompositions)
+library(dplyr)
 library(ggplot2)
+
+library(Biostrings)
+library(zCompositions)
+library(phyloseq)
+library(ape)
 library(vegan)
+
 
 
 samplefile <- here("1_samples_properties", "Metadata_singleTree_wDirich-K10.tsv")
@@ -45,11 +48,12 @@ ntaxa(physeq)
 sample_variables(physeq)
 rank_names(physeq)
 
+### First task
 # Read your data
 parmedian_dir <- "3.1_Neutral_NMGS/Results_K10"
 otu_dir <- "2_Dirichlet/otu_tables_K10"
 
-# Get immigration rates
+## Get immigration rates
 imm_rates <- get_immigration_rates(parmedian_dir = parmedian_dir, dirichlet_otu_dir = otu_dir)
 rownames(imm_rates)
 
@@ -66,7 +70,32 @@ merged_sample_data$Row.names <- NULL
 # Update the sample_data in the phyloseq object
 sample_data(physeq) <- sample_data(merged_sample_data)
 
-# Ordination
+## Get speciation rate
+
+sp_rates <- get_metacommunity_rates(parmedian_dir = parmedian_dir)
+rownames(sp_rates) <- sp_rates$metacommunity
+sp_rates$metacommunity <- NULL
+
+current_sample_data <- data.frame(sample_data(physeq))
+
+merged_df <- merge(data.frame(sample_data(physeq)), sp_rates, by = 0, all = TRUE,
+suffixes = c(".sample", ".metacomm"))
+
+# Combine 'rate' columns
+meta_df <- merged_df %>%
+  mutate(rate = coalesce(rate.sample, rate.metacomm)) %>%
+  dplyr::select(-rate.sample, -rate.metacomm)
+
+rownames(meta_df) <- meta_df$Row.names
+meta_df$Row.names <- NULL
+
+# Update the sample_data in the phyloseq object
+sample_data(physeq) <- sample_data(meta_df)
+
+write.table(meta_df, sep = '\t', row.names = TRUE, col.names = TRUE,
+"1_samples_properties/Metadata_singleTree_wDirich-K10_wNMGS.tsv")
+
+### Ordination
 otu.czm <- cmultRepl(t(otu_table(physeq)), method="CZM", output="p-counts", z.delete = FALSE)
 
 zpat <- zPatterns(t(otu_table(physeq)), label = 0, type = "cgm", plot = TRUE)
