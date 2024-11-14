@@ -1,4 +1,4 @@
-`library(tidyverse)
+library(tidyverse)
 
 get_immigration_rates <- function(parmedian_dir, dirichlet_otu_dir) {
   # Get all ParMedian files
@@ -48,7 +48,7 @@ get_immigration_rates <- function(parmedian_dir, dirichlet_otu_dir) {
       # Create dataframe with sample IDs as row names
       rates_df <- data.frame(
         metacommunity = metacom_name,
-        immigration_rate = rates,
+        rate = rates,
         row.names = sample_ids,
         stringsAsFactors = FALSE
       )
@@ -92,7 +92,7 @@ get_metacommunity_rates <- function(parmedian_dir) {
       # Add to results
       rates_df <- data.frame(
         metacommunity = metacom_name,
-        speciation_rate = rate,
+        rate = rate,
         stringsAsFactors = FALSE
       )
       
