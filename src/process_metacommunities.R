@@ -1,19 +1,26 @@
 library(tidyverse)
 
-# Function to extract values from FULL MODEL section
-extract_full_model_values <- function(relabmetac_file) {
+# Function to extract values from LOCAL MODEL section
+extract_local_model_values <- function(relabmetac_file) {
   # Read lines from file
   lines <- readLines(relabmetac_file)
   
-  # Find where FULL MODEL section starts
-  full_model_start <- which(grepl("#FullModel", lines)) + 1
+  # Find where Local Model section starts (line 5)
+  local_model_start <- which(grepl("#LocalModel", lines))
   
-  if (length(full_model_start) == 0) {
-    stop(paste("No FULL MODEL section found in", relabmetac_file))
+  if (length(local_model_start) == 0) {
+    stop(paste("No Local Model section found in", relabmetac_file))
   }
   
-  # Extract values after FULL MODEL
-  values <- lines[full_model_start:length(lines)]
+  # Find where Full Model section starts (this marks the end of Local Model section)
+  full_model_start <- which(grepl("#FullModel", lines))
+  
+  if (length(full_model_start) == 0) {
+    stop(paste("No Full Model section found in", relabmetac_file))
+  }
+  
+  # Extract values between Local Model and Full Model sections
+  values <- lines[(local_model_start + 1):(full_model_start - 1)]
   values <- values[values != ""]  # Remove empty lines
   
   # Split each line and take second value (abundance)
@@ -49,7 +56,7 @@ process_metacommunities <- function(k7_results_dir, k7_otu_dir) {
     
     # Get ASV IDs and abundance values
     asv_ids <- get_asv_ids(otu_file)
-    abundances <- extract_full_model_values(relabmetac_file)
+    abundances <- extract_local_model_values(relabmetac_file)
     
     # Check lengths match
     # if (length(asv_ids) != length(abundances)) {

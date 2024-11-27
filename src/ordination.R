@@ -1,4 +1,5 @@
 source("src/immigration_rates.R")
+source("src/process_metacommunities.R")
 
 library(here)
 library(dplyr)
@@ -94,6 +95,37 @@ sample_data(physeq) <- sample_data(meta_df)
 
 write.table(meta_df, sep = '\t', row.names = TRUE, col.names = TRUE,
 "1_samples_properties/Metadata_singleTree_wDirich-K10_wNMGS.tsv")
+
+
+### Process metacommunities
+
+# Manual test, check if the files match on number of ASV's
+# k7 C2
+# otu_table: 2370 ASV's
+# Local: 5-2375 = 2370
+# Full:2377-4963 = 2586
+
+# k10 C1
+# Local 3131
+# otu table:2489
+
+# k10 C2
+# Local: 2370
+# otu table: 2764
+
+# k10 C9
+# Local: 985
+# otu table: 985
+
+# Paths
+k10_results_dir <- "3.1_Neutral_NMGS/Results_K10"
+k10_otu_dir <- "2_Dirichlet/otu_tables_K10"
+
+# Process metacommunities
+df <- process_metacommunities(k10_results_dir, k10_otu_dir)
+cat("\nFirst few rows of the combined table:\n")
+print(head(df))
+
 
 ### Ordination
 otu.czm <- cmultRepl(t(otu_table(physeq)), method="CZM", output="p-counts", z.delete = FALSE)
