@@ -16,8 +16,8 @@ and use the scripts. Please remove any absolute paths**
 
 The scripts provided are:
 
-* `dada2_treeholes.R`: **Josep add description**
-* `rename_otu_table_after_dada2.R` : **Josep add description**
+* `dada2_treeholes.R`: This script turns the raw sequencing reads into amplicon sequence variants (ASVs) that are classified into their corresponding taxonomic affiliation. Reads are demultiplexed, trimmed of adaptors and primers,  quality-filtered, dereplicated, counted, and taxonomically assigned to generate an ASV table, taxonomy table, and a representative sequences fasta file.  
+* `rename_otu_table_after_dada2.R` : Change the sample names of the ASV table to match those in the metadata file (mapping file).
 * `filter_rare_ASVs.R`: This script takes the ASVs table generated through the dada2 pipeline and, after removing samples with a low number of reads, filter ASVs with a low
 number of reads and/or obverved in few samples.
 * `split_otu_table_Dirichlet.R`: It  includes the factor identifying the Dirichlet components in the metadata table, and then split the otu table into subtables, to run NMGS.
@@ -30,7 +30,7 @@ External code published by other authors is described in the correspondent data 
 
 The data folders contain:
 
-* `1_dada2`: dada2 pipeline ... **Josep please describe data contained and data excluded. Since the starting data are gigantic, we will point to a repo in which data can be downloaded such that the user can download it and run the pipeline.**
+* `1_dada2`: dada2 pipeline outputs from `dada2_treeholes.R`. Contains the plots describing sequencing read quality throughout the pipeline, as well as the ASV table, taxonomy table, and representative sequence files. **WILL EXCLUDE FILES AT THE END**
 * `1_samples_properties`: Different files describing the experiment's metadata and figures describing samples properties.
 * `2_Dirichlet`: Output of the Dirichlet mixtures clustering. Code to generate this data is available from the reference
 > Holmes, Ian, Keith Harris, and Christopher Quince. "Dirichlet multinomial mixtures: generative models for microbial metagenomics." PloS one 7.2 (2012): e30126.
