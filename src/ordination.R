@@ -122,9 +122,25 @@ k10_results_dir <- "3.1_Neutral_NMGS/Results_K10"
 k10_otu_dir <- "2_Dirichlet/otu_tables_K10"
 
 # Process metacommunities
-df <- process_metacommunities(k10_results_dir, k10_otu_dir)
-cat("\nFirst few rows of the combined table:\n")
-print(head(df))
+df2 <- process_metacommunities(k10_results_dir, k10_otu_dir, 10)
+
+df1 <- data.frame(otu_table(physeq))
+df1 <- transform(df1, rowname = rownames(df1))
+
+df2 <- df2 %>% dplyr::rename(rowname = ASV)
+
+# Merge based on the rowname column
+df_merged <- merge(df1, df2, by = "rowname", all = TRUE)  # all=TRUE for a full join
+
+# Set the row names back to the merged data frame (optional)
+rownames(df_merged) <- df_merged$rowname
+df_merged$rowname <- NULL
+
+outfp = "/Users/theco/Projects/niche_vs_neutral/1_dada2/otu_table_treeholes_dada2_renamed_clean_red_rar_metacom.csv"
+write.csv(df_merged, outfp)
+
+# Update the merged data in the phyloseq object
+# otu_table(physeq) <- otu_table(as.matrix(df_merged), taxa_are_rows = TRUE)
 
 
 ### Ordination

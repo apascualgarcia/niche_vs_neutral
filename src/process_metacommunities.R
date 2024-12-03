@@ -32,6 +32,12 @@ extract_local_model_values <- function(relabmetac_file) {
   # Remove any NAs that might have come from malformed lines
   abundances <- abundances[!is.na(abundances)]
   
+  # Remove the last element (other species) and renormalize
+  if (length(abundances) > 1) {
+    abundances <- abundances[-length(abundances)]  # Remove last element
+    abundances <- abundances / sum(abundances)     # Renormalize to sum to 1
+  }
+  
   return(abundances)
 }
 
@@ -42,46 +48,48 @@ get_asv_ids <- function(otu_file) {
 }
 
 # Main function to process all metacommunities
-process_metacommunities <- function(k7_results_dir, k7_otu_dir) {
-  # Initialize list to store metacommunity abundances
+process_metacommunities <- function(results_dir, otu_dir, n_metacom) {
+  # Initialize list to store all ASV IDs and abundances
+  all_asv_ids <- character()
   metacom_abundances <- list()
   
-  # Process each metacommunity
-  for (i in 1:7) {  # K7 has 7 metacommunities
+  # First pass: collect all unique ASV IDs and store abundances
+  for (i in 1:n_metacom) {
     # Construct file paths
-    relabmetac_file <- file.path(k7_results_dir, 
+    relabmetac_file <- file.path(results_dir, 
       sprintf("otu_table_treeholes_dada2_renamed_clean_red_DirichC%d_relAbMetac.txt", i))
-    otu_file <- file.path(k7_otu_dir,
+    otu_file <- file.path(otu_dir,
       sprintf("otu_table_treeholes_dada2_renamed_clean_red_DirichC%d_rar.csv", i))
     
     # Get ASV IDs and abundance values
     asv_ids <- get_asv_ids(otu_file)
     abundances <- extract_local_model_values(relabmetac_file)
     
-    # Check lengths match
-    # if (length(asv_ids) != length(abundances)) {
-    #   stop(sprintf("Mismatch in number of ASVs (%d) and abundances (%d) for metacommunity %d",
-    #               length(asv_ids), length(abundances), i))
-    # }
-    
-    # Store in list
+    # Store abundances with their ASV IDs
+    names(abundances) <- asv_ids[1:length(abundances)]
     metacom_abundances[[sprintf("C%d", i)]] <- abundances
     
-    # Store ASV IDs from first metacommunity
-    if (i == 1) {
-      all_asv_ids <- asv_ids
-    }
+    # Add to master list of ASV IDs
+    all_asv_ids <- union(all_asv_ids, asv_ids[1:length(abundances)])
   }
   
-  # Convert list to data frame
+  # Create data frame with all ASV IDs
   df <- data.frame(ASV = all_asv_ids)
-  for (metacom in names(metacom_abundances)) {
-    df[[metacom]] <- metacom_abundances[[metacom]]
-  }
   
-  # Save to file
-  # write.csv(df, output_file, row.names = FALSE)
-  # cat(sprintf("Saved combined metacommunity abundances to %s\n", output_file))
+  # Second pass: fill in abundances for each metacommunity
+  for (metacom in names(metacom_abundances)) {
+    abundances <- metacom_abundances[[metacom]]
+    
+    # Create a vector of zeros for all ASVs
+    metacom_col <- rep(0, length(all_asv_ids))
+    names(metacom_col) <- all_asv_ids
+    
+    # Fill in the actual abundances where we have them
+    metacom_col[names(abundances)] <- abundances
+    
+    # Add to dataframe
+    df[[metacom]] <- metacom_col
+  }
   
   return(df)
 }
@@ -89,11 +97,11 @@ process_metacommunities <- function(k7_results_dir, k7_otu_dir) {
 # Execute if running as script
 if (!interactive()) {
   # Paths
-  k7_results_dir <- "3.1_Neutral_NMGS/Results_K7"
-  k7_otu_dir <- "2_Dirichlet/otu_tables_K7"
+  k10_results_dir <- "3.1_Neutral_NMGS/Results_K10"
+  k10_otu_dir <- "2_Dirichlet/otu_tables_K10"
   
   # Process metacommunities
-  df <- process_metacommunities(k7_results_dir, k7_otu_dir)
+  df <- process_metacommunities(k10_results_dir, k10_otu_dir, 10)
   cat("\nFirst few rows of the combined table:\n")
   print(head(df))
 }
