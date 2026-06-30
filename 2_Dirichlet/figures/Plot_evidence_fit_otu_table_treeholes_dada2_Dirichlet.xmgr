@@ -123,7 +123,7 @@
 @timestamp rot 0
 @timestamp font 0
 @timestamp char size 1.000000
-@timestamp def "Tue Oct 22 11:37:01 2024"
+@timestamp def "Tue Jun 30 23:14:42 2026"
 @r0 off
 @link r0 to g0
 @r0 type above
@@ -170,7 +170,7 @@
 @g0 fixedpoint format general general
 @g0 fixedpoint prec 6, 6
 @with g0
-@    world 0, 760000, 30, 930000
+@    world 0, 780000, 20, 870000
 @    stack world 0, 0, 0, 0
 @    znorm 1
 @    view 0.150000, 0.150000, 1.150000, 0.850000
@@ -252,7 +252,7 @@
 @    yaxis  label color 1
 @    yaxis  label place normal
 @    yaxis  tick on
-@    yaxis  tick major 50000
+@    yaxis  tick major 20000
 @    yaxis  tick minor ticks 1
 @    yaxis  tick default 6
 @    yaxis  tick place rounded true
@@ -313,7 +313,7 @@
 @    frame pattern 1
 @    frame background color 0
 @    frame background pattern 0
-@    s0 hidden false
+@    s0 hidden true
 @    s0 type xy
 @    s0 symbol 1
 @    s0 symbol size 0.410000
@@ -364,12 +364,12 @@
 @    s0 legend  ""
 @    s1 hidden false
 @    s1 type xy
-@    s1 symbol 0
-@    s1 symbol size 1.000000
-@    s1 symbol color 2
+@    s1 symbol 1
+@    s1 symbol size 0.410000
+@    s1 symbol color 1
 @    s1 symbol pattern 1
-@    s1 symbol fill color 2
-@    s1 symbol fill pattern 0
+@    s1 symbol fill color 1
+@    s1 symbol fill pattern 1
 @    s1 symbol linewidth 1.0
 @    s1 symbol linestyle 1
 @    s1 symbol char 65
@@ -378,7 +378,7 @@
 @    s1 line type 1
 @    s1 line linestyle 1
 @    s1 line linewidth 1.0
-@    s1 line color 2
+@    s1 line color 1
 @    s1 line pattern 1
 @    s1 baseline type 0
 @    s1 baseline off
@@ -400,7 +400,7 @@
 @    s1 avalue offset 0.000000 , 0.000000
 @    s1 errorbar on
 @    s1 errorbar place both
-@    s1 errorbar color 2
+@    s1 errorbar color 1
 @    s1 errorbar pattern 1
 @    s1 errorbar size 1.000000
 @    s1 errorbar linewidth 1.0
