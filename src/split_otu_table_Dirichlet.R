@@ -18,14 +18,16 @@
 
 rm(list = ls())
 # SET WORKING DIRECTORY -----------------------------
-this.dir=strsplit(rstudioapi::getActiveDocumentContext()$path, "/src/")[[1]][1] # don't edit, just comment it if problems...
+this.dir = here::here() # project root (works both in RStudio and with Rscript)
 dirSrc=paste(this.dir,"/src/",sep="") # Directory where the code is
 dirInput=paste(this.dir,"/1_dada2/",sep="") # Dir of input data 
 dirMeta=paste(this.dir,"/1_samples_properties/",sep="") # Dir of dada2 output
 dirDirich=paste(this.dir,"/2_Dirichlet/",sep="") # Dir of Dirichlet analysis
-dirOutput=paste(this.dir,"/2_Dirichlet/",sep="") # Dir of output data
 
-Ncomp = 10  # Number of Dirichlet components
+args = commandArgs(trailingOnly = TRUE)
+Ncomp = if (length(args) > 0) as.integer(args[1]) else 10  # Number of Dirichlet components (Rscript split_otu_table_Dirichlet.R 7)
+dirOutput=paste(this.dir,"/2_Dirichlet/otu_tables_K",Ncomp,"/",sep="") # Dir of output data
+dir.create(dirOutput, showWarnings = FALSE)
 file.otu = "otu_table_treeholes_dada2_renamed_clean_red.tsv"
 file.otu.label = "otu_table_treeholes_dada2_renamed_clean_red" # file name without extension
 file.meta = "Metadata_singleTree.tsv"
@@ -80,7 +82,6 @@ df.meta$Dirichlet[matched] = apply(df.dirich, MARGIN = 1, # identify the compone
 head(df.meta)[1:5,]
 df.meta$Dirichlet[df.meta$Dirichlet == 0] = NA  # identify the remainder as NA
 
-set.seed(260324) # today
 #comp = colnames(df.dirich)[1] # debug
 setwd(dirOutput)
 for(comp in colnames(df.dirich)){
@@ -89,13 +90,14 @@ for(comp in colnames(df.dirich)){
   id.comp = which(df.dirich[, comp] > 0)
   samples = rownames(df.dirich[id.comp, ])
   matched = match(samples, colnames(otu.table))
-  otu.table.tmp = as.matrix(otu.table[, matched])
-  otu.table.tmp = otu.table.tmp[rowSums(otu.table.tmp)> 0, ]
+  otu.table.tmp = as.matrix(otu.table[, matched, drop = FALSE]) # drop = FALSE keeps the ASV names when a component has a single sample
+  otu.table.tmp = otu.table.tmp[rowSums(otu.table.tmp)> 0, , drop = FALSE]
   otu.table.tmp.t = t(otu.table.tmp)
   otu.pseq.tmp = otu_table(as.matrix(otu.table.tmp), taxa_are_rows = TRUE)
+  set.seed(1) # Seed 1 is the one used for the committed results: rngseed = TRUE in phyloseq meant set.seed(1)
   otu.pseq.tmp.rar =  rarefy_even_depth(otu.pseq.tmp, 
                                          sample.size = min(sample_sums(otu.pseq.tmp)),
-                                         rngseed = TRUE, replace = TRUE, trimOTUs = TRUE, verbose = TRUE)
+                                         rngseed = FALSE, replace = TRUE, trimOTUs = TRUE, verbose = TRUE)
   cat(paste0("Dimensions rarefied table ",dim(otu.pseq.tmp.rar@.Data)))
   cat(paste0("\n Number ASVs with zero counts: ",length(which(rowSums(otu.pseq.tmp.rar@.Data) == 0))),"\n")
   
@@ -104,16 +106,21 @@ for(comp in colnames(df.dirich)){
   file.out = paste0(file.otu.label,"_Dirich",comp,"_t.tsv")
   write.table(otu.table.tmp.t, file = file.out, quote = F, sep = "\t")
   file.out = paste0(file.otu.label,"_Dirich",comp,"_rar.csv")
-  write.table(otu.pseq.tmp.rar@.Data, file = file.out, quote = F, sep = ",",col.names = NA)
+  # NMGS input: first column must be labelled "OTUs"
+  write.table(data.frame(OTUs = rownames(otu.pseq.tmp.rar@.Data), otu.pseq.tmp.rar@.Data, check.names = F),
+              file = file.out, quote = F, sep = ",", row.names = F)
 }
 
 # --- Rarefy original table
+set.seed(1)
 otu.pseq.rar =  rarefy_even_depth(otu.pseq, 
                                       sample.size = min(sample_sums(otu.pseq)),
-                                      rngseed = TRUE, replace = TRUE, trimOTUs = TRUE, verbose = TRUE)
+                                      rngseed = FALSE, replace = TRUE, trimOTUs = TRUE, verbose = TRUE)
 setwd(dirInput)
 file.out = paste0(file.otu.label,"_rar.csv")
-write.table(otu.pseq.rar@.Data, file = file.out, quote = F, sep = ",",col.names = NA)
+# NMGS input: first column must be labelled "OTUs"
+write.table(data.frame(OTUs = rownames(otu.pseq.rar@.Data), otu.pseq.rar@.Data, check.names = F),
+            file = file.out, quote = F, sep = ",", row.names = F)
 
 # --- Write new metadata table
 setwd(dirMeta)

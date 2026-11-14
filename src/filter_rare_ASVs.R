@@ -16,7 +16,7 @@
 rm(list = ls())
 
 # SET WORKING DIRECTORY -----------------------------
-this.dir=strsplit(rstudioapi::getActiveDocumentContext()$path, "/src/")[[1]][1] # don't edit, just comment it if problems...
+this.dir = here::here() # project root (works both in RStudio and with Rscript)
 
 dirSrc=paste(this.dir,"/src/",sep="") # Directory where the code is
 dirInput=paste(this.dir,"/1_dada2/",sep="") # Dir of dada2 output 
@@ -61,12 +61,11 @@ taxa_wsp<-read.csv('taxonomy.list')
 
 #-- Metadata
 setwd(dirMeta)
-samdf_treeholes<-read.table('Metadata_singleTree.csv', 
+samdf_treeholes<-read.table('Metadata_singleTree.tsv', 
                           sep = "\t", header = T)
 head(samdf_treeholes)[1:10,1:10]
-samdf_treeholes = subset(samdf_treeholes, select = -X)
 
-taxa_wsp<-read.csv(file.path(dirInputASV,'taxonomy.list'))
+taxa_wsp<-read.csv(file.path(dirInput,'taxonomy.list'))
 
 nrow(seqtab_treeholes)
 ncol(seqtab_treeholes)
@@ -79,20 +78,23 @@ plot(sort(rowSums(seqtab_treeholes))) # there is a change in the slope for sampl
 # FILTER SEQUENCES --------------------------------------------------------
 
 #remove communities with less than 5K sequences
+# NOTE: [,-1] leaves the first ASV (ASV_1) out of the read count. Kept as it is
+# because the published tables were built this way; counting all ASVs would keep
+# two more samples (F.D.DNA.P1.A3.E.08.ID03.11.15.THS.2.16S.3 and
+# F.D.DNA.P2.B3.E.06.ID18.11.14.THS.6.16S.3) and change every downstream result.
 seqtab_treeholes<-seqtab_treeholes[which(rowSums(seqtab_treeholes[,-1])>5000),]
 nrow(seqtab_treeholes)
 
 #remove OTUs with less than 100 reads across all samples
-seqtab_treeholes<-seqtab_treeholes[,-which(colSums(seqtab_treeholes)<100)]
+seqtab_treeholes<-seqtab_treeholes[,colSums(seqtab_treeholes)>=100] # (-which() would drop all columns if none matched)
 ncol(seqtab_treeholes)
 
 #remove OTUs occurring in less than 10 samples
-seqtab_treeholes<-seqtab_treeholes[,-which(colSums(seqtab_treeholes>0)<10)]
+seqtab_treeholes<-seqtab_treeholes[,colSums(seqtab_treeholes>0)>=10]
 ncol(seqtab_treeholes)
 
 #remove CONTROL communities
-ctrl.id = grep(rownames(seqtab_treeholes),pattern = "CONTROL")
-seqtab_treeholes <- seqtab_treeholes[-ctrl.id,]
+seqtab_treeholes <- seqtab_treeholes[!grepl("CONTROL", rownames(seqtab_treeholes)),]
 
 # FILTER THE SAMPLE METADATA AND TAXA TABLE ACCORDING TO REMAINING COMMUNITIES AND ASVS, respectively -------------------------------------------------------------------------
 
@@ -113,10 +115,14 @@ setwd(dirInput)
 seqtab_treeholes_t = t(seqtab_treeholes)
 write.table(seqtab_treeholes, file = "otu_table_treeholes_dada2_renamed_clean_red_t.tsv",
             sep = "\t", col.names = NA, row.names = T, quote = F)
+# The first column is labelled "Taxon": with an empty label the Dirichlet
+# multinomial mixture code (DirichletMixtureGHPFit, input = the .csv) silently
+# drops one sample. R scripts reading these tables rename it as needed.
+seqtab_treeholes_t = data.frame(Taxon = rownames(seqtab_treeholes_t), seqtab_treeholes_t, check.names = F)
 write.table(seqtab_treeholes_t, file = "otu_table_treeholes_dada2_renamed_clean_red.tsv",
-            sep = "\t", col.names = NA, row.names = T, quote = F)
+            sep = "\t", row.names = F, quote = F)
 write.table(seqtab_treeholes_t, file = "otu_table_treeholes_dada2_renamed_clean_red.csv",
-            sep = ",", col.names = NA, row.names = T, quote = F)
+            sep = ",", row.names = F, quote = F)
 
 # ------ Metadata and taxa
 

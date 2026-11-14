@@ -6,13 +6,15 @@ library(stringi)
 library(stringr)
 library(phyloseq)
 library(ggplot2)
+library(vegan) # rarefy() used by ggrare() in Rfunctions.R
 
 
 # --- Set directories
-this.dir = strsplit(rstudioapi::getActiveDocumentContext()$path, "/src/")[[1]][1] 
+this.dir = here::here() # project root (works both in RStudio and with Rscript)
 
 dirSrc=paste(this.dir,"/src/",sep="") # Directory where the code is
 dirInput=paste(this.dir,"/1_dada2/",sep="") # Dir of the configuration file
+dirMeta=paste(this.dir,"/1_samples_properties/",sep="") # Dir of the metadata
 dirOutput=paste(this.dir,"/1_dada2/",sep="") # Dir where the output will be saved
 
 
@@ -23,6 +25,7 @@ setwd(dirInput)
 #sequence table from DADA2 
 seqtab_treeholes <- read.table('otu_table_treeholes_dada2_renamed_clean_red.tsv', 
                                sep = "\t", header = T)
+names(seqtab_treeholes)[1] = "X" # first column is labelled "Taxon" (needed by the Dirichlet code)
 rownames(seqtab_treeholes) = seqtab_treeholes$X
 head(seqtab_treeholes)[1:10,1:10]
 
@@ -48,9 +51,9 @@ otu_table_treeholes_phyloseq[1:10,1:10]
 names(otu_table_treeholes_phyloseq)[names(otu_table_treeholes_phyloseq) == "X"] = "#OTU ID"
 
 #Read metadata
-samdf_treeholes <- read.table('Metadata_singleTree.csv', 
+samdf_treeholes <- read.table(file.path(dirMeta, 'Metadata_singleTree.tsv'), 
                               sep = "\t", header = T)
-samdf_treeholes = subset(samdf_treeholes, select = -c(UID, X))
+samdf_treeholes = samdf_treeholes[, !names(samdf_treeholes) %in% c("UID", "X")] # index columns of the old .csv version
 names(samdf_treeholes)[names(samdf_treeholes) == "ID.OTU"] = "#SampleID"
 samdf_treeholes[1:10,1:10]
 
@@ -66,17 +69,17 @@ physeq
 
 ##RAREFACTION
 #Rarefaction plot
-source("Rfunctions.R")
+source(file.path(dirSrc, "Rfunctions.R"))
 rarefaction.plot = ggrare(physeq, step = 200, se = FALSE) + xlim(c(0,max(sample_sums(physeq)))) + ylim(0,2000) + theme_bw() + theme(axis.text.x = element_text(size = 20), axis.text.y=element_text(size=20), legend.position = "null",
                                                                                                                 axis.title.x = element_text(size = 20, margin = margin(r = 15)), axis.title.y = element_text(size =20, margin = margin(r = 10))) + xlab("Number of reads")
 
-tiff("Rarefaction_plot_treeholes.tiff", units="cm", width=15, height=15, res=300)
+tiff(file.path(dirMeta, "Rarefaction_plot_treeholes.tiff"), units="cm", width=15, height=15, res=300)
 rarefaction.plot
 dev.off()
 
-set.seed(123)
+set.seed(1) # Seed 1 is the one used for the committed results: rngseed = TRUE in phyloseq meant set.seed(1)
 Dt = rarefy_even_depth(physeq, sample.size = min(sample_sums(physeq)),
-                       rngseed = TRUE, replace = TRUE, trimOTUs = TRUE, verbose = TRUE)
+                       rngseed = FALSE, replace = TRUE, trimOTUs = TRUE, verbose = TRUE)
 Dt
 
 ##REMOVAL OF MITOCHONDRIA AND CHLOROPLAST
