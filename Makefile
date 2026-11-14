@@ -23,6 +23,7 @@ RSCRIPT ?= Rscript
 PYTHON  ?= python3
 K       ?= 10# Number of Dirichlet components (metacommunities); 7 and 10 were explored
 NMGS    ?= 3.1_Neutral_NMGS/NMGS/C/NMGS# NMGS binary (github.com/microbiome/NMGS)
+CORES   ?= 16# Cores for the parallel null models (stegen_null)
 PICRUST ?= picrust2_pipeline.py
 THREADS ?= 4
 
@@ -39,7 +40,7 @@ DIRTAB   := $(DIR)/otu_tables_K$(K)
 DIRICH_Z := $(DIR)/otu_table_treeholes_dada2_Dirichlet_K$(K).z
 COMPS    := $(shell seq 1 $(K))
 
-.PHONY: help all asv_tables phyloseq_tables repset tree samples_figures \
+.PHONY: help all asv_tables phyloseq_tables repset tree samples_figures stegen_null \
         dirichlet split nmgs rates_metadata neutral_stats immigration stegen envfit rda_composition rda_rates \
         picrust stamp dada2 rename
 
@@ -58,6 +59,7 @@ help:
 	@echo "  rates_metadata   add the NMGS immigration/speciation rates to the metadata"
 	@echo "  neutral_stats    summary of immigration/speciation rates per component"
 	@echo "  immigration      immigration/speciation rate figures (3.1_Neutral_NMGS/figures)"
+	@echo "  stegen_null      betaNTI and Raup-Crick null models, parallel (~15 min on 16 cores)"
 	@echo "  stegen           bNTI/Raup-Crick assembly heatmap (3.2_Neutral_Stegen/figures)"
 	@echo "  envfit           composition barplots, PCoA, envfit (4.1_Niche_Envir/figures)"
 	@echo "  rda_composition  RDA: which environmental variables explain composition (4.1_Niche_Envir/rda/composition)"
@@ -65,10 +67,10 @@ help:
 	@echo "  picrust          [external] PICRUSt2 functional prediction"
 	@echo "  stamp            convert the KEGG L3 biom table to STAMP format"
 	@echo "  all              every non-external target"
-	@echo "Variables: K=$(K) RSCRIPT=$(RSCRIPT) PYTHON=$(PYTHON) NMGS=$(NMGS)"
+	@echo "Variables: K=$(K) RSCRIPT=$(RSCRIPT) PYTHON=$(PYTHON) NMGS=$(NMGS) CORES=$(CORES)"
 
 all: asv_tables phyloseq_tables repset tree samples_figures split rates_metadata neutral_stats \
-     envfit immigration stegen rda_composition rda_rates
+     envfit immigration stegen_null stegen rda_composition rda_rates
 
 # --- 1. Sequence processing ----------------------------------------------------
 dada2:
@@ -206,6 +208,13 @@ $(IMM_FIGS) &: $(META)/Metadata_singleTree_wDirich-K10_rates.tsv \
 	$(RSCRIPT) $(SRC)/immigration_speciation_rates_analysis.R
 
 # --- 3.2 Stegen et al. null models ------------------------------------------------
+# 999 randomisations, seed fixed in the script; results do not depend on CORES.
+STEGEN_NULL := $(addprefix $(STEG)/, betaNTI_treeholes.csv betaNTI_unweighted_treeholes.csv \
+	betaMNTD_treeholes.csv RC_bray_treeholes.csv stegen_null_models.log)
+stegen_null: $(STEG)/betaNTI_treeholes.csv
+$(STEGEN_NULL) &: $(DADA)/$(OTU).tsv $(STEG)/nj_tree_stegen.tre | $(SRC)/stegen_null_models.R
+	$(RSCRIPT) $(SRC)/stegen_null_models.R cores=$(CORES)
+
 stegen: $(STEG)/figures/AssemblyProcessHeatmap_treehole_metacommunities_k10_2026.pdf
 $(STEG)/figures/AssemblyProcessHeatmap_treehole_metacommunities_k10_2026.pdf: \
 		$(STEG)/betaNTI_treeholes.csv $(STEG)/RC_bray_treeholes.csv \
