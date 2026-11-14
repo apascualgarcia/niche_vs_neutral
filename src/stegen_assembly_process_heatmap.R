@@ -167,7 +167,7 @@ metac_plot
 # Save output
 # ----------------------------
 ggsave(
-  filename = here("figures", "AssemblyProcessHeatmap_treehole_metacommunities_k10_2026.tiff"),
+  filename = here("3.2_Neutral_Stegen", "figures", "AssemblyProcessHeatmap_treehole_metacommunities_k10_2026.tiff"),
   plot = metac_plot,
   units = "cm",
   width = 12,
@@ -175,7 +175,7 @@ ggsave(
   dpi = 300
 )
 
-pdf(here("figures", "AssemblyProcessHeatmap_treehole_metacommunities_k10_2026.pdf"),
+pdf(here("3.2_Neutral_Stegen", "figures", "AssemblyProcessHeatmap_treehole_metacommunities_k10_2026.pdf"),
     width = 12/2.54, height = 12/2.54)  
 metac_plot
 dev.off()

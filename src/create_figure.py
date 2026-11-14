@@ -20,7 +20,7 @@ print(f'otu_table shape: {otu_table.shape}')
 
 # Read the TSV file
 metadata = pd.read_csv(project_dir / '1_samples_properties' /
-                       'Metadata_singleTree.csv', sep='\t')
+                       'Metadata_singleTree.tsv', sep='\t')
 metadata = metadata.rename(columns={'ID.Sample': 'sampleid'})
 print(f'metadata shape: {metadata.shape}')
 
@@ -29,8 +29,9 @@ merged_data = pd.merge(metadata, otu_table,
                        left_on='sampleid', right_on='sampleid')
 print(f'merged_data shape: {merged_data.shape}')
 
-# Calculate the total number of reads per sample
-merged_data['total_reads'] = merged_data.iloc[:, 35:].sum(axis=1)
+# Calculate the total number of reads per sample (sum of the ASV columns)
+asv_cols = otu_table.columns.drop('sampleid')
+merged_data['total_reads'] = merged_data[asv_cols].sum(axis=1)
 
 # Create a new dataframe with the required information
 plot_data = merged_data[['Date', 'Location', 'total_reads']].copy()

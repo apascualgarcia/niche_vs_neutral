@@ -5,7 +5,7 @@ here::here()
 library(stringi)
 
 # --- Set directories
-this.dir=strsplit(rstudioapi::getActiveDocumentContext()$path, "/src/")[[1]][1] # don't edit, just comment it if problems...
+this.dir = here::here() # project root (works both in RStudio and with Rscript)
 
 dirSrc=paste(this.dir,"/src/",sep="") # Directory where the code is
 dirInput=paste(this.dir,"/1_dada2/",sep="") # Dir of the configuration file

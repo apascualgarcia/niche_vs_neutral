@@ -10,8 +10,9 @@ library(here)
 # READ IN DATA ------------------------------------------------------------
 
 #sequence table from DADA2 
-seqtab_treeholes <- read.table(here("2_Dirichlet", "otu_tables_K10", "otu_table_treeholes_dada2_renamed_clean_red.tsv"),
+seqtab_treeholes <- read.table(here("1_dada2", "otu_table_treeholes_dada2_renamed_clean_red.tsv"),
                                sep = "\t", header = T)
+names(seqtab_treeholes)[1] = "X" # first column is labelled "Taxon" (needed by the Dirichlet code)
 rownames(seqtab_treeholes) = seqtab_treeholes$X
 head(seqtab_treeholes)[1:10,1:10]
 
@@ -37,25 +38,25 @@ otu_table_treeholes_phyloseq[1:10,1:10]
 names(otu_table_treeholes_phyloseq)[names(otu_table_treeholes_phyloseq) == "X"] = "#OTU ID"
 
 #Read metadata
-samdf_treeholes <- read.csv(here("1_samples_properties", "Metadata_singleTree_wDirich-K10.csv"), header = T)
+samdf_treeholes <- read.csv(here("1_samples_properties", "Metadata_singleTree_wDirich-K10.tsv"), header = T, sep = "\t") # the .csv version is not in the repo
 head(samdf_treeholes)
 
 names(samdf_treeholes)[names(samdf_treeholes) == "ID.Sample"] = "#SampleID"
 samdf_treeholes[1:10,1:10]
 
-#write.table(samdf_treeholes, here("1_samples_properties", "Metadata_singleTree_wDirich-K10_phyloseq.tsv"), sep = "\t", quote = F, row.names = F)
-#write.table(otu_table_treeholes_phyloseq, here("2_Dirichlet", "otu_tables_K10", "otu_table_treeholes_dada2_renamed_clean_red_phyloseq.tsv"), sep = "\t", quote = F, row.names = F)
+write.table(samdf_treeholes, here("1_samples_properties", "Metadata_singleTree_wDirich-K10_phyloseq.tsv"), sep = "\t", quote = F, row.names = F)
+#write.table(otu_table_treeholes_phyloseq, here("1_dada2", "otu_table_treeholes_dada2_renamed_clean_red_phyloseq.tsv"), sep = "\t", quote = F, row.names = F)
 
 ###IMPORT AS PHYLOSEQ
 mapfile = here("1_samples_properties", "Metadata_singleTree_wDirich-K10_phyloseq.tsv")
-otufile = here("2_Dirichlet", "otu_tables_K10", "otu_table_treeholes_dada2_renamed_clean_red_phyloseq.tsv")
+otufile = here("1_dada2", "otu_table_treeholes_dada2_renamed_clean_red_phyloseq.tsv")
 
 physeq = import_qiime(otufilename = otufile, mapfilename = mapfile)
 physeq
 
-set.seed(123)
+set.seed(1) # Seed 1 is the one used for the committed results: rngseed = TRUE in phyloseq meant set.seed(1)
 Dt = rarefy_even_depth(physeq, sample.size = min(sample_sums(physeq)),
-                       rngseed = TRUE, replace = TRUE, trimOTUs = TRUE, verbose = TRUE)
+                       rngseed = FALSE, replace = TRUE, trimOTUs = TRUE, verbose = TRUE)
 Dt
 
 ##REMOVAL OF MITOCHONDRIA AND CHLOROPLAST
@@ -424,7 +425,7 @@ dist_aitchison <- dist(otu_table_clr, method = "euclidean")
 pcoa_res <- cmdscale(dist_aitchison, k = 3, eig = TRUE)
 scores_df <- as.data.frame(pcoa_res$points)
 colnames(scores_df) <- c("PC1", "PC2", "PC3")
-scores_df <- cbind(scores_df, env.data) # Combine with sample metadata
+scores_df <- cbind(scores_df[rownames(env.data), ], env.data) # Combine with sample metadata (env.data drops samples without metacommunity, e.g. the CONTROL)
 head(scores_df)
 
 # Step 3: Fit environmental factors
@@ -438,6 +439,7 @@ prep_significant_arrows <- function(envfit_res, dim_cols) {
     as.data.frame() %>%
     filter(envfit_res$P < 0.05)
   
+  names(sig)[1:2] = sub("Dim", "PC", dim_cols) # arrows use the same axis names as the scores
   sig = sig[sig$Variable != "Dirichlet",]
   sig$Variable = as.factor(sig$Variable)
   levels(sig$Variable)[levels(sig$Variable) == "Dought_days"] <- "Drought days"

@@ -9,12 +9,12 @@ library(stringr)
 library(phyloseq)
 library(ggplot2)
 library(ape)
-library(spider)
+#library(spider) # not used
 library(Biostrings)
 library(DECIPHER)
 
 # --- Set directories
-this.dir=strsplit(rstudioapi::getActiveDocumentContext()$path, "/src/")[[1]][1] # don't edit, just comment it if problems...
+this.dir = here::here() # project root (works both in RStudio and with Rscript)
 
 dirSrc=paste(this.dir,"/src/",sep="") # Directory where the code is
 dirInput=paste(this.dir,"/1_dada2/",sep="") # Dir of the configuration file
@@ -58,4 +58,4 @@ nj_tree_stegen = nj(dist_matrix_treeholes)
 nj_tree_stegen
 
 #3 SAVE TREE FILE
-write.tree(nj_tree_stegen, file = "nj_tree_stegen.tre", )
+write.tree(nj_tree_stegen, file = file.path(this.dir, "3.2_Neutral_Stegen", "nj_tree_stegen.tre"))

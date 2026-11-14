@@ -7,9 +7,10 @@ here::here()
 library(stringi)
 library(stringr)
 library(Biostrings)
+library(phyloseq) # import_qiime, refseq, subset_taxa
 
 # --- Set directories
-this.dir=strsplit(rstudioapi::getActiveDocumentContext()$path, "/src/")[[1]][1] # don't edit, just comment it if problems...
+this.dir = here::here() # project root (works both in RStudio and with Rscript)
 
 dirSrc=paste(this.dir,"/src/",sep="") # Directory where the code is
 dirInput=paste(this.dir,"/1_dada2/",sep="") # Dir of the configuration file

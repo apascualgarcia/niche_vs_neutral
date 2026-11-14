@@ -1,7 +1,6 @@
 #!/bin/bash
+# Draw the reads-per-tree-hole figures (1_samples_properties/reads_per_treehole_*.png).
+# Requires: pip install pandas matplotlib   (or use `make samples_figures` from the repo root)
 
-# Install required packages
-pip install pandas matplotlib seaborn
-
-# Run the Python script
-python create_figure.py
+# Run the Python script from wherever this file lives
+python3 "$(dirname "$0")/create_figure.py"

@@ -5,7 +5,7 @@ here::here()
 library(stringi)
 
 # --- Set directories
-this.dir=strsplit(rstudioapi::getActiveDocumentContext()$path, "/src/")[[1]][1] # don't edit, just comment it if problems...
+this.dir = here::here() # project root (works both in RStudio and with Rscript)
 
 dirSrc=paste(this.dir,"/src/",sep="") # Directory where the code is
 dirInput=paste(this.dir,"/1_dada2/",sep="") # Dir of the configuration file
@@ -27,11 +27,18 @@ library(plotly); packageVersion("plotly") # enables creation of interactive grap
 
 
 # Set up pathway to idemp (demultiplexing tool) and test
-idemp <- dirInput # CHANGE ME if not on microbe
+# ---- EDIT: external tools and reference (not in the repo) ----
+# idemp (github.com/yhwu/idemp) demultiplexes the raw reads with a barcode table:
+#   idemp -b barcodes.txt -I1 <I1.fastq.gz> -R1 <R1.fastq.gz> -R2 <R2.fastq.gz> -o 1_dada2/
+# which writes one Undetermined_S0_L001_R{1,2}_001.fastq.gz_<sample> file per sample (renamed below).
+idemp <- "idemp" # CHANGE ME: full path to the idemp binary if it is not in your PATH
 system2(idemp) # Check that idemp is in your path and you can run shell commands from R
 
 # Set up pathway to cutadapt (primer trimming tool) and test
-cutadapt <- dirInput 
+cutadapt <- "cutadapt" # CHANGE ME: full path to cutadapt if it is not in your PATH
+# dada2-formatted SILVA training set used by assignTaxonomy() (version not recorded; the
+# taxonomy names, e.g. Bacteroidota, imply SILVA >= 138; https://zenodo.org/records/4587955)
+silva.ref <- file.path(dirInput, "silva_nr99_v138.1_train_set.fa.gz") # CHANGE ME
 system2(cutadapt, args = "--version") # Check by running shell command from R
 
 # Set path to shared data folder and contents
@@ -305,7 +312,7 @@ seqtab.nochim <- removeBimeraDenovo(st.all, method="consensus", multithread=TRUE
 ## [1] 98.33841
 
 # Assign taxonomy
-tax <- assignTaxonomy(seqtab.nochim, dirInput, tryRC = TRUE,
+tax <- assignTaxonomy(seqtab.nochim, silva.ref, tryRC = TRUE,
                       multithread=TRUE)
 
 # Write results to disk
