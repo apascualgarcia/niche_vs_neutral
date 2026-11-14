@@ -1,10 +1,13 @@
 # Niche vs neutral assembly in tree-hole microbial communities
 
-Data and code used for the paper ...
+Data and code used for the paper:
 
-How much of the assembly of tree-hole bacterial communities (16S rRNA amplicons, 10 tree
-holes sampled over time) is explained by deterministic (**niche**) and by stochastic
-(**neutral**) processes?
+```
+ _Identifying the metacommunity scale reconciles
+deterministic and stochastic assembly in a natural mainland–island microbial system_
+Javier Cuadrado Corz, Josep Ramoneda, Diego Alcón, Thomas Bell & Alberto Pascual-García.
+```
+
 
 ---
 
@@ -287,7 +290,7 @@ Converts a BIOM table into a STAMP profile (Morgan Langille, GPL). For example:
 
 ### One-off and legacy scripts
 
-* `fix_treehole_morphology.R`: corrects the tree-hole morphology of five samples in the metadata (already applied; see [Known issues](#known-issues)).
+* `fix_treehole_morphology.R`: one-off correction of the metadata, already applied to all metadata tables: five samples from 17.02.15 (plate P1, tree holes 3, 4, 6, 7, 9) carried the morphology (`SA`, `Volume`, `Depth`, `Distance.from.previous.TH`, `Deg.North`) of another tree hole.
 * `legacy/taxonomy_betadiversity_envfit_rarefiedCLR.R`: previous envfit script (rarefied counts; the CLR of its PCoA figure was computed across samples). Replaced by J. Ramoneda's version, now `taxonomy_betadiversity_envfit.R`.
 * `legacy/phyloseq_analysis_private.R`: early exploratory phyloseq analysis from a previous project. It uses old metadata and absolute paths, and is not part of the pipeline.
 
@@ -338,7 +341,7 @@ picrust2_pipeline.py -i 1_dada2/otu_table_treeholes_dada2_renamed_clean_red.biom
     -s 1_dada2/repset_treeholes_dada2_phyloseq_clean.fasta -o 4.2_Niche_PiCRUSTsc -p 10 \
     --in_traits EC,KO,GO,PFAM,BIGG,CAZY,GENE_NAMES
 ```
-* 40 of the 3537 ASVs exceed the maximum NSTI (2.0) and are dropped; the median NSTI is 0.30.
+* 40 of the 3537 ASVs exceed the maximum NSTI (2.0) and are dropped; 
 * KOs are mapped to KEGG level 3 (`KEGGs_vs_samples.L3.tsv`) with PICRUSt's `categorize_by_func.R`.
 * Apostrophes were removed from pathway names, and the first column was labelled `KEGG_Pathways`.
 * Converted with `biom convert --table-type="Pathway table" --to-hdf5` and `make stamp`.
@@ -412,15 +415,5 @@ R scripts that read these tables rename the column themselves.
 
 ## Known issues
 
-* **Corrected metadata (2026-10-27).** In the original metadata, five samples from 17.02.15
-  (plate P1, tree holes 3, 4, 6, 7, 9) had the morphology (`SA`, `Volume`, `Depth`,
-  `Distance.from.previous.TH`, `Deg.North`) of another tree hole. `fix_treehole_morphology.R`
-  corrected them in all metadata tables.
-* **Read-count filter.** `filter_rare_ASVs.R` excludes ASV_1 when counting reads per sample
-  (`rowSums(x[,-1])`). Counting it would keep two more samples. The original behaviour is kept so the published tables reproduce.
-  ASV_1 itself is present in every count table.
-* **Single-sample component.** Dirichlet component C9 (K = 10; C4 for K = 7) has one sample. `split_otu_table_Dirichlet.R` lost the
-  ASV names of its tables (rows `1, 2, ...` / `sp1, ...`); fixed with `drop = FALSE` (2026-10-28) and the tables regenerated. The counts did not change.
 * **Stegen inputs.** No code in this repo computes `betaNTI_treeholes.csv` and `RC_bray_treeholes.csv`. The RC matrix has 165 samples (including a CONTROL), so it was built from an older table.
 * **Tree.** The neighbour-joining tree has the same 3537 tips when regenerated, but a different topology (alignment depends on the `DECIPHER` version).
-* **CLR orientation (fixed 2026-10-28).** The previous envfit and immigration scripts applied the CLR per ASV across samples for the PCoA figures. Both now use the Aitchison PCoA computed in `taxonomy_betadiversity_envfit.R`, and all figures in `4.1_Niche_Envir/figures` and the PCoA figures in `3.1_Neutral_NMGS/figures` were regenerated.
