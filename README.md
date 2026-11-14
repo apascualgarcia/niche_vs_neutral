@@ -2,12 +2,9 @@
 
 Data and code used for the paper:
 
-```
- _Identifying the metacommunity scale reconciles
-deterministic and stochastic assembly in a natural mainland–island microbial system_
-Javier Cuadrado Corz, Josep Ramoneda, Diego Alcón, Thomas Bell & Alberto Pascual-García.
-```
 
+ _Identifying the metacommunity scale reconciles deterministic and stochastic assembly in a natural mainland–island microbial system_
+Javier Cuadrado Corz, Josep Ramoneda, Diego Alcón, Thomas Bell & Alberto Pascual-García.
 
 ---
 
