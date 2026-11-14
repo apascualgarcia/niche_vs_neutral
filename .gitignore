@@ -4,3 +4,8 @@
 .Ruserdata
 .DS_Store
 launch.json
+.~lock.*#
+__pycache__/
+# local symlink to the NMGS code (github.com/microbiome/NMGS)
+3.1_Neutral_NMGS/NMGS
+Rplots.pdf

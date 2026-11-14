@@ -1,1 +1,0 @@
-/home/apascual/APASCUAL/Research/Programs/microbacteria/FunctionalGroups/Python/biom_to_stamp.py
