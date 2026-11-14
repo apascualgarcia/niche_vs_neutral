@@ -77,12 +77,8 @@ plot(sort(rowSums(seqtab_treeholes))) # there is a change in the slope for sampl
 
 # FILTER SEQUENCES --------------------------------------------------------
 
-#remove communities with less than 5K sequences
-# NOTE: [,-1] leaves the first ASV (ASV_1) out of the read count. Kept as it is
-# because the published tables were built this way; counting all ASVs would keep
-# two more samples (F.D.DNA.P1.A3.E.08.ID03.11.15.THS.2.16S.3 and
-# F.D.DNA.P2.B3.E.06.ID18.11.14.THS.6.16S.3) and change every downstream result.
-seqtab_treeholes<-seqtab_treeholes[which(rowSums(seqtab_treeholes[,-1])>5000),]
+#remove communities with less than 5K sequences (all ASV columns are counted)
+seqtab_treeholes<-seqtab_treeholes[which(rowSums(seqtab_treeholes)>5000),]
 nrow(seqtab_treeholes)
 
 #remove OTUs with less than 100 reads across all samples

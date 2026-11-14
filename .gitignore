@@ -9,3 +9,5 @@ __pycache__/
 # local symlink to the NMGS code (github.com/microbiome/NMGS)
 3.1_Neutral_NMGS/NMGS
 Rplots.pdf
+# private files (not shared): any file with the _private label
+*_private*
