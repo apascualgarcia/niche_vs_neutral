@@ -111,6 +111,7 @@ make split K=7       # targets that depend on the number of Dirichlet components
 | `neutral_stats` | `extract_neutral_stats.R` | `3.1_Neutral_NMGS/Results_K10/neutral_stats_perDirichlet.tsv` |
 | `envfit` | `taxonomy_betadiversity_envfit.R` | `4.1_Niche_Envir/figures/*`, `1_samples_properties/Metadata_singleTree_wDirich-K10_phyloseq.tsv` |
 | `immigration` | `immigration_speciation_rates_analysis.R` | `3.1_Neutral_NMGS/figures/*` |
+| `stegen_null` | `stegen_null_models.R` (parallel, `CORES=16`, ~15 min) | `3.2_Neutral_Stegen/{betaNTI,betaNTI_unweighted,betaMNTD,RC_bray}_treeholes.csv`, `stegen_null_models.log` |
 | `stegen` | `stegen_assembly_process_heatmap.R` | `3.2_Neutral_Stegen/figures/AssemblyProcessHeatmap_*` |
 | `rda_composition` | `rda_composition_environment.R` | `4.1_Niche_Envir/rda/composition/*`, `4.1_Niche_Envir/rda/results_summary.csv` |
 | `rda_rates` | `rda_neutral_rates_environment.R` | `4.1_Niche_Envir/rda/neutral_rates/*`, `4.1_Niche_Envir/rda/results_summary.csv` |
@@ -143,6 +144,7 @@ make split K=7       # targets that depend on the number of Dirichlet components
   | `split_otu_table_Dirichlet.R` | `phyloseq`, `stringr` |
   | `extract_neutral_stats.R` | `dplyr` |
   | `immigration_speciation_rates_analysis.R` | `phyloseq`, `vegan`, `ggplot2`, `dplyr`, `tidyr`, `purrr`, `reshape2`, `data.table`, `stringi`, `stringr` |
+  | `stegen_null_models.R` | `ape`, `vegan`, `parallel` (forked processes: Linux/macOS) |
   | `stegen_assembly_process_heatmap.R` | `dplyr`, `tidyr`, `reshape2`, `ggplot2` |
   | `taxonomy_betadiversity_envfit.R` | `phyloseq`, `vegan`, `compositions`, `ggpmisc`, `ggplot2`, `RColorBrewer`, `colorspace`, `dplyr`, `tibble`, `stringi`, `stringr` |
   | `rda_composition_environment.R` (+ `rda_functions.R`) | `vegan`, `permute`, `phyloseq`, `ggplot2`, `ggrepel` |
@@ -256,10 +258,20 @@ It also relates the drought prevalence of each tree hole (maximum number of drou
 * **Input:** `1_samples_properties/Metadata_singleTree_wDirich-K10_rates.tsv`. The metadata column `Dought_days` (misspelt) is copied to `Drought_days` by `add_predictors()` in `rda_functions.R`.
 * **Output:** `4.1_Niche_Envir/rda/neutral_rates/` (`results_summary.csv`, `summary.txt`, tables `.csv`, figures `.pdf`); the manuscript uses `immigration_vs_size_shape_fit.pdf` (Fig. 3B), `variance_explained_combined.pdf` (Fig. 3C; immigration only: `variance_explained_immigration.pdf`), `drought_vs_depth.pdf` (Fig. 3D), and `immigration_vs_size_shape.pdf`, `drought_vs_depth_and_ratio.pdf` and `speciation_metacommunity_top_variable.pdf` (Suppl. Figs.). `immigration_vs_morphology_fit.pdf` adds the model with the highest adjusted R2 next to the a priori one
 
+#### `stegen_null_models.R`
+Null models of Stegen et al. (2013) for every pair of samples, on the unrarefied filtered table:
+* **βNTI:** standardised effect size of βMNTD (as `picante::comdistnt`, `exclude.conspecifics = FALSE`) against 999 shuffles of the ASV labels across the tree tips (`taxaShuffle`). The abundance-weighted βNTI is the one used; the unweighted one is also written.
+* **RC_bray:** Raup-Crick on Bray-Curtis (Chase et al. 2011, as modified by Stegen et al. 2013), with 999 null communities that keep the richness and the reads of each sample. Ties are split, and the index is scaled to [-1, 1].
+* Each randomisation computes all pairs at once, and randomisations run in parallel on forked processes. Each randomisation has its own random stream derived from the seed (`seed=20261114`), so the results do not depend on the number of cores. Arguments: `reps`, `cores`, `seed`, `outdir`, `suffix`.
+* It replaces the 2020 code (not in the repo), whose `raup_crick_abundance()` used 10 randomisations whatever value was requested. The previous `RC_bray_treeholes.csv` came from that code and from an older table that still had the CONTROL sample. Rerunning with 999 randomisations kept 97% of the pair classifications. The previous βNTI (weighted) is reproduced with r = 0.998.
+* **Input:** `1_dada2/otu_table_treeholes_dada2_renamed_clean_red.tsv`, `3.2_Neutral_Stegen/nj_tree_stegen.tre`
+* **Output:** `3.2_Neutral_Stegen/betaNTI_treeholes.csv` (weighted), `betaNTI_unweighted_treeholes.csv`, `betaMNTD_treeholes.csv` (observed weighted βMNTD), `RC_bray_treeholes.csv`, `stegen_null_models.log` (parameters, time, `sessionInfo()`)
+
 #### `stegen_assembly_process_heatmap.R`
 Classifies each pair of samples as homogeneous or variable selection (|βNTI| > 2), homogenising dispersal or dispersal limitation (|RC| > 0.95), or drift. Plots the pairwise processes as a heatmap, with samples ordered by metacommunity.
 * **Input:** `3.2_Neutral_Stegen/betaNTI_treeholes.csv`, `3.2_Neutral_Stegen/RC_bray_treeholes.csv`, `1_samples_properties/Metadata_singleTree_wDirich-K10.tsv`
 * **Output:** `3.2_Neutral_Stegen/figures/AssemblyProcessHeatmap_treehole_metacommunities_k10_2026.{pdf,tiff}`
+* Other inputs or output: `Rscript src/stegen_assembly_process_heatmap.R bnti=<csv> rc=<csv> out=<path without extension>`
 
 ### 4. Niche processes
 
@@ -363,7 +375,7 @@ Set the paths to these three (`idemp <-`, `cutadapt <-`, `silva.ref <-`) at the 
 | `1_samples_properties` | Sample metadata (`Metadata_singleTree*`; `old_metadata/` holds earlier versions) and figures of sample properties (reads per sample, rarefaction curves) |
 | `2_Dirichlet` | Dirichlet mixture fits for K = 1–22: `*.fit` (model fit), `*.z` (sample assignments), `*.mixture` (component parameters), `*.err` (logs); evidence plots in `figures/`; ASV tables split by component in `otu_tables_K7/` and `otu_tables_K10/`; `*.z_Location_*` files (how tree holes distribute across components). `2_Dirichlet_noseed_sep2024.tar.bz2` archives a run without a fixed seed |
 | `3.1_Neutral_NMGS` | NMGS results in `Results_K7/`, `Results_K10/`: `*_rar_NMGS.csv` (MCMC samples of θ and immigration rates), `*_rar_NMGS_s.csv` (statistics of neutral samples), `*_ParMedians.txt`, `*_relAbMetac.txt`, `*_DirichC-All_logLikePseudPval.txt`, merged rates, `neutral_stats_perDirichlet.tsv`; `figures/` |
-| `3.2_Neutral_Stegen` | `betaNTI_treeholes.csv`, `RC_bray_treeholes.csv` (pairwise βNTI and Raup-Crick), `nj_tree_stegen.tre` (ASV tree), `figures/` |
+| `3.2_Neutral_Stegen` | `betaNTI_treeholes.csv` (weighted), `betaNTI_unweighted_treeholes.csv`, `betaMNTD_treeholes.csv`, `RC_bray_treeholes.csv` (pairwise βNTI and Raup-Crick), `stegen_null_models.log`, `nj_tree_stegen.tre` (ASV tree), `figures/` |
 | `4.1_Niche_Envir` | Composition and environment: `figures/` (figures, envfit tables, PCoA scores; `envfit_results_aitchison_pcoa_k10metadata.csv` is an older envfit table), `rda/` (`results_summary.csv`, `composition/`, `neutral_rates/`) |
 | `4.2_Niche_PiCRUST` | PICRUSt2, default reference: `*_predicted.tsv.gz`, `*_metagenome_out/`, `pathways_out/`, `KEGG_pathways_out/` (KEGG level 3 in biom, tsv and STAMP formats), `intermediate/`, `figures/` |
 | `4.2_Niche_PiCRUSTsc` | PICRUSt2 ≥ 2.6 with bacterial (`bac_*`), archaeal (`arc_*`) and combined (`combined_*`) references and more databases (CAZy, GO, BiGG, gene names); `analysis/` has the differential-pathway plots between metacommunities |
@@ -415,5 +427,4 @@ R scripts that read these tables rename the column themselves.
 
 ## Known issues
 
-* **Stegen inputs.** No code in this repo computes `betaNTI_treeholes.csv` and `RC_bray_treeholes.csv`. The RC matrix has 165 samples (including a CONTROL), so it was built from an older table.
 * **Tree.** The neighbour-joining tree has the same 3537 tips when regenerated, but a different topology (alignment depends on the `DECIPHER` version).

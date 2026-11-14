@@ -1,0 +1,44 @@
+Date: 2026-11-14 13:36:41.488187
+Elapsed: 13.23899 mins
+reps = 999
+cores = 16
+seed = 20261114
+outdir = 3.2_Neutral_Stegen/rerun (output files then moved to 3.2_Neutral_Stegen)
+suffix = 
+Samples: 164  ASVs: 3537
+R version 4.6.2 (2026-10-29)
+Platform: x86_64-pc-linux-gnu
+Running under: Ubuntu 24.04.5 LTS
+
+Matrix products: default
+BLAS:   /usr/lib/x86_64-linux-gnu/blas/libblas.so.3.12.0 
+LAPACK: /usr/lib/x86_64-linux-gnu/lapack/liblapack.so.3.12.0  LAPACK version 3.12.0
+
+Random number generation:
+ RNG:     L'Ecuyer-CMRG 
+ Normal:  Inversion 
+ Sample:  Rejection 
+ 
+locale:
+ [1] LC_CTYPE=es_ES.UTF-8       LC_NUMERIC=C              
+ [3] LC_TIME=es_ES.UTF-8        LC_COLLATE=es_ES.UTF-8    
+ [5] LC_MONETARY=es_ES.UTF-8    LC_MESSAGES=es_ES.UTF-8   
+ [7] LC_PAPER=es_ES.UTF-8       LC_NAME=C                 
+ [9] LC_ADDRESS=C               LC_TELEPHONE=C            
+[11] LC_MEASUREMENT=es_ES.UTF-8 LC_IDENTIFICATION=C       
+
+time zone: Europe/Madrid
+tzcode source: system (glibc)
+
+attached base packages:
+[1] parallel  stats     graphics  grDevices utils     datasets  methods  
+[8] base     
+
+other attached packages:
+[1] here_1.0.2     vegan_2.7-6    permute_0.9-10 ape_5.8-1     
+
+loaded via a namespace (and not attached):
+ [1] digest_0.6.39   mgcv_1.9-4      Matrix_1.7-6    lattice_0.23-1 
+ [5] splines_4.6.2   grid_4.6.2      compiler_4.6.2  rprojroot_2.1.1
+ [9] tools_4.6.2     cluster_2.1.8.2 nlme_3.1-171    Rcpp_1.1.2     
+[13] MASS_7.3-66    
