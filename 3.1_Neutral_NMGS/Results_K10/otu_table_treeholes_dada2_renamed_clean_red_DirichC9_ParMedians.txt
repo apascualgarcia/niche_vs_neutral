@@ -1,0 +1,5 @@
+# Biodiversity and immigration rates parameter medians and confidence intervals
+# Computed with Medians.pl and cat here (ExtractMedians.sh) as standard output
+#OTU Proportion
+1241.956491 1661.214829 2256.579943
+424.659767 490.768779 586.118603

@@ -1,0 +1,15 @@
+# Speciation rates parameter medians and confidence intervals
+# Computed with ConcatenateMedians2labels.pl taking all Dirichlet files (labelled id below):
+# Input files:  2_Dirichlet/otu_tables_K10/otu_table_treeholes_dada2_renamed_clean_red_DirichCid_t.tsv
+# Input files:  3.1_Neutral_NMGS/Results_K10/otu_table_treeholes_dada2_renamed_clean_red_DirichCid_ParMedians.txt
+Dirichlet	Speciation_low	Speciation_med	Speciation_high
+1	539.233506 563.512504 589.340901
+2	611.737763 638.768681 666.191036
+3	563.325183 590.586106 618.747463
+4	600.441799 634.458423 670.080785
+5	532.302177 562.093822 593.537038
+6	596.156737 623.360084 651.566260
+7	462.522240 484.444608 507.803320
+8	615.263324 643.102731 671.981597
+9	1241.956491 1661.214829 2256.579943
+10	582.878950 609.400609 636.546993
