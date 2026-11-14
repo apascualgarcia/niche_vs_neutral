@@ -1,0 +1,119 @@
+RDA of community composition (CLR, Aitchison geometry) on environmental variables
+Samples: 147  ASVs: 3537 
+Aitchison PCoA % variance axes 1-3: 21.2 12.5 8.8 
+
+Size/Shape correlations:
+                            Pair r.treeholes r.samples
+             log.Depth vs log.SA       0.717     0.688
+ log.Volume vs log.Depth.surface       0.366     0.296
+                   Size vs Shape       0.000    -0.066
+
+Dropped for VIF > 10: Air.Temp Soil.Temp4 
+
+Forward selection, CLR response: Size Eastness Shape Northness Drought_days Air.Temp.max 
+  adj. R2 = 0.308 
+Forward selection, PCoA1-3 response: Size Shape Eastness Northness 
+  adj. R2 = 0.544 
+
+Tree-hole identity adj. R2: CLR 0.528 ; PCoA1-3 0.901 
+
+Morphology combinations (tree-hole permutations, n = 10 tree holes):
+                                Variables adjR2.CLR P.treehole.perm.CLR
+                  Size + Shape + Eastness 0.2503588              0.0341
+        log.Volume + Northness + Eastness 0.2316429              0.0716
+         log.Depth + Northness + Eastness 0.2311629              0.0792
+              Size + Northness + Eastness 0.2303322              0.0755
+                 Size + Shape + Northness 0.2287309              0.0957
+            log.SA + Northness + Eastness 0.2127467              0.1692
+                    log.Volume + Eastness 0.2079352              0.0053
+                          Size + Eastness 0.2077554              0.0049
+                             Size + Shape 0.1987643              0.0164
+                     log.Depth + Eastness 0.1978841              0.0156
+                        log.SA + Eastness 0.1945591              0.0156
+ log.Depth.surface + Northness + Eastness 0.1708881              0.5813
+ P.selection.corrected.CLR adjR2.PCoA1_3 P.treehole.perm.PCoA1_3
+                    0.0908     0.5212338                  0.0258
+                    0.2060     0.4722822                  0.0522
+                    0.2090     0.4670820                  0.0614
+                    0.2178     0.4691321                  0.0548
+                    0.2328     0.4930425                  0.0446
+                    0.3906     0.4221638                  0.1207
+                    0.4465     0.4565763                  0.0051
+                    0.4486     0.4564645                  0.0047
+                    0.5509     0.4637042                  0.0074
+                    0.5606     0.4261881                  0.0161
+                    0.5965     0.4218846                  0.0134
+                    0.8296     0.2926145                  0.5550
+ P.selection.corrected.PCoA1_3
+                        0.0726
+                        0.1649
+                        0.1763
+                        0.1723
+                        0.1198
+                        0.3211
+                        0.2064
+                        0.2067
+                        0.1854
+                        0.3078
+                        0.3215
+                        0.8152
+
+Highest adj. R2: CLR Size Shape Eastness ; PCoA1-3 Size Shape Eastness 
+Morphology in varpart and final model (a priori): Size Shape 
+
+Time-varying variables | tree hole (within-tree-hole permutations):
+Permutation test for rda under reduced model
+Marginal effects of terms
+Blocks:  envs$Treehole 
+Permutation: free
+Number of permutations: 999
+
+Model: rda(formula = Y ~ Moisture + log.Max.Lum + Air.Temp.max + Air.Temp.min + Rainfall + Drought_days + Condition(Treehole), data = envs)
+              Df Variance      F Pr(>F)    
+Moisture       1    13.64 2.0572  0.001 ***
+log.Max.Lum    1     7.57 1.1423  0.169    
+Air.Temp.max   1    10.13 1.5269  0.011 *  
+Air.Temp.min   1     8.36 1.2604  0.055 .  
+Rainfall       1     8.32 1.2546  0.065 .  
+Drought_days   1    14.12 2.1292  0.001 ***
+Residual     131   868.69                  
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Variation partitioning (adj. R2):
+                                  Partition Df Adj.R.squared
+[a] = X1|X2      Morphology vs time-varying  2    0.17156748
+[b] = X2|X1      Morphology vs time-varying  3    0.03207864
+[c]              Morphology vs time-varying  0    0.02719683
+[d] = Residuals  Morphology vs time-varying NA    0.76915705
+[a] = X1|X21      Tree hole vs time-varying  9    0.49856623
+[b] = X2|X11      Tree hole vs time-varying  3    0.03034034
+[c]1              Tree hole vs time-varying  0    0.02893513
+[d] = Residuals1  Tree hole vs time-varying NA    0.44215831
+
+Final model: Size Shape Moisture Air.Temp.max Drought_days  adj. R2 = 0.231 
+Permutation test for rda under reduced model
+Forward tests for axes
+Permutation: free
+Number of permutations: 999
+
+Model: rda(formula = Y ~ Size + Shape + Moisture + Air.Temp.max + Drought_days, data = envs)
+          Df Variance       F Pr(>F)    
+RDA1       1   326.30 28.1558  0.001 ***
+RDA2       1   148.71 12.9231  0.001 ***
+RDA3       1    47.84  4.1862  0.001 ***
+RDA4       1    28.59  2.5198  0.012 *  
+RDA5       1    14.32  1.2704  0.172    
+Residual 141  1634.05                   
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Biplot scores of the final model:
+               RDA1   RDA2   RDA3
+Size         -0.949 -0.266  0.102
+Shape        -0.177  0.972  0.072
+Moisture     -0.430  0.050 -0.766
+Air.Temp.max  0.112 -0.127  0.286
+Drought_days  0.478 -0.258  0.799
+attr(,"const")
+[1] 23.80588

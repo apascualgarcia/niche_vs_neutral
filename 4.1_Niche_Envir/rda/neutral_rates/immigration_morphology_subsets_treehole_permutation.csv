@@ -1,0 +1,31 @@
+"Response","Variables","k","R2","adjR2","P.treehole.perm","P.selection.corrected","Fraction.of.treehole"
+"Immigration rate (log)","Size + Shape + Eastness",3,0.208638338565979,0.192036345668762,0.0711,0.1742,0.754
+"Immigration rate (log)","log.Depth.surface + Eastness",2,0.197409643936757,0.186262555658101,0.0334,0.1974,0.731
+"Immigration rate (log)","log.Depth.surface + Northness + Eastness",3,0.198632332687512,0.181820423583055,0.104,0.2188,0.714
+"Immigration rate (log)","Size + Shape",2,0.187008233213065,0.175716680896579,0.0431,0.2469,0.69
+"Immigration rate (log)","Size + Shape + Northness",3,0.187995628708143,0.170960571967754,0.1277,0.2698,0.671
+"Immigration rate (log)","log.Depth.surface",1,0.174326006281666,0.168631702876712,0.0153,0.279,0.662
+"Immigration rate (log)","log.Depth.surface + Northness",2,0.177307403962504,0.165881117906427,0.0639,0.2933,0.651
+"Immigration rate (log)","log.Depth + Eastness",2,0.168526802926267,0.156978564078021,0.0709,0.3368,0.616
+"Immigration rate (log)","log.Depth + Northness + Eastness",3,0.173314226198846,0.155971168007213,0.1741,0.3426,0.612
+"Immigration rate (log)","Shape + Eastness",2,0.167153198340608,0.155585881650894,0.0835,0.3443,0.611
+"Immigration rate (log)","Shape + Northness + Eastness",3,0.167929101151421,0.150473068308444,0.2089,0.3728,0.591
+"Immigration rate (log)","Shape",1,0.13229545094549,0.126311281641666,0.0562,0.5025,0.496
+"Immigration rate (log)","Shape + Northness",2,0.135167492607253,0.123155930004576,0.171,0.5178,0.484
+"Immigration rate (log)","log.Volume + Northness + Eastness",3,0.141016315655167,0.12299567892066,0.3103,0.5183,0.483
+"Immigration rate (log)","log.Volume + Eastness",2,0.131326614238758,0.119261706103185,0.1715,0.5407,0.468
+"Immigration rate (log)","Size + Northness + Eastness",3,0.136144776860378,0.118021940011295,0.3311,0.5472,0.463
+"Immigration rate (log)","Size + Eastness",2,0.125996813302493,0.113857880153916,0.1885,0.5701,0.447
+"Immigration rate (log)","log.Depth",1,0.118774062223409,0.112696641962881,0.0637,0.5769,0.442
+"Immigration rate (log)","log.Depth + Northness",2,0.124065170634074,0.111899409115103,0.1878,0.5813,0.439
+"Immigration rate (log)","Northness + Eastness",2,0.104428696813377,0.0919902064913403,0.2837,0.6818,0.361
+"Immigration rate (log)","Eastness",1,0.0979944448193438,0.0917737168525806,0.1085,0.6827,0.36
+"Immigration rate (log)","log.SA + Northness + Eastness",3,0.110404828938887,0.0917419931823602,0.4693,0.6828,0.36
+"Immigration rate (log)","log.SA + Eastness",2,0.101013274943784,0.0885273482068922,0.2946,0.699,0.348
+"Immigration rate (log)","log.Volume + Northness",2,0.065663636847499,0.0526867429148253,0.4757,0.8562,0.207
+"Immigration rate (log)","log.Volume",1,0.0533758891831625,0.0468474470395981,0.2614,0.8764,0.184
+"Immigration rate (log)","Size + Northness",2,0.056805174035012,0.0437052458966095,0.5328,0.8874,0.172
+"Immigration rate (log)","Size",1,0.043866910399327,0.0372728890917362,0.3124,0.9094,0.146
+"Immigration rate (log)","Northness",1,0.00797898240738537,0.00113745814812594,0.6725,0.9935,0.004
+"Immigration rate (log)","log.SA + Northness",2,0.0131339678769673,-0.000572504791408024,0.8854,0.9958,-0.002
+"Immigration rate (log)","log.SA",1,0.00223611107174054,-0.00464501919673022,0.8278,0.9996,-0.018

@@ -1,0 +1,3 @@
+"Response","Step","R2.adj","Df","AIC","F","Pr..F."
+"Immigration + speciation (standardised log rates)","+ Size",0.145124016722095,1,80.829471625192,25.7850060779377,0.001
+"Immigration + speciation (standardised log rates)","<All variables>",0.216455010271213,NA,NA,NA,NA

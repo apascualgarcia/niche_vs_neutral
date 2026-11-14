@@ -1,0 +1,31 @@
+"Response","Variables","k","R2","adjR2","P.treehole.perm","P.selection.corrected","Fraction.of.treehole"
+"Immigration + speciation (standardised log rates)","Size + Shape + Eastness",3,0.245246751877408,0.22941276765106,0.1897,0.3531,0.531
+"Immigration + speciation (standardised log rates)","Size + Shape",2,0.233892917247899,0.223252541098565,0.0794,0.3796,0.517
+"Immigration + speciation (standardised log rates)","Size + Shape + Northness",3,0.234550767787807,0.218492392286852,0.2045,0.3981,0.506
+"Immigration + speciation (standardised log rates)","log.Depth + Eastness",2,0.222393519987133,0.211593429986954,0.0962,0.4302,0.49
+"Immigration + speciation (standardised log rates)","log.Depth + Northness + Eastness",3,0.225722915996152,0.20947934080726,0.2401,0.4391,0.485
+"Immigration + speciation (standardised log rates)","log.Depth",1,0.197473540562275,0.191938875324773,0.0403,0.5122,0.445
+"Immigration + speciation (standardised log rates)","log.Volume + Eastness",2,0.20177000067197,0.190683472903525,0.1254,0.5187,0.442
+"Immigration + speciation (standardised log rates)","log.Volume + Northness + Eastness",3,0.206954493929733,0.190317175620566,0.3036,0.5205,0.441
+"Immigration + speciation (standardised log rates)","log.Depth + Northness",2,0.201048109381999,0.189951555345638,0.1332,0.5219,0.44
+"Immigration + speciation (standardised log rates)","Size + Northness + Eastness",3,0.201863483643713,0.185119360922952,0.3238,0.543,0.429
+"Immigration + speciation (standardised log rates)","Size + Eastness",2,0.196142112193279,0.184977419307074,0.1371,0.5437,0.429
+"Immigration + speciation (standardised log rates)","log.Volume + Northness",2,0.166347605299304,0.15476909981735,0.2154,0.6668,0.359
+"Immigration + speciation (standardised log rates)","log.Volume",1,0.159767902566476,0.153973198446245,0.0657,0.6705,0.357
+"Immigration + speciation (standardised log rates)","Size + Northness",2,0.158251998171365,0.146561053701523,0.2412,0.6995,0.34
+"Immigration + speciation (standardised log rates)","Size",1,0.150979331676054,0.145124016722095,0.0751,0.7059,0.336
+"Immigration + speciation (standardised log rates)","log.SA + Northness + Eastness",3,0.157543923436208,0.139870019732072,0.5167,0.7272,0.324
+"Immigration + speciation (standardised log rates)","log.SA + Eastness",2,0.149375996414631,0.137561774142612,0.2907,0.7364,0.319
+"Immigration + speciation (standardised log rates)","log.Depth.surface + Northness + Eastness",3,0.142553096345057,0.124564699764883,0.5886,0.7824,0.289
+"Immigration + speciation (standardised log rates)","log.Depth.surface + Eastness",2,0.136038022293742,0.124038550381155,0.3251,0.7846,0.287
+"Immigration + speciation (standardised log rates)","log.Depth.surface + Northness",2,0.131153485450553,0.119086172748478,0.3531,0.8046,0.276
+"Immigration + speciation (standardised log rates)","log.Depth.surface",1,0.123085593508923,0.117037907946915,0.1257,0.8101,0.271
+"Immigration + speciation (standardised log rates)","Shape + Eastness",2,0.0982323932342245,0.0857078431402554,0.5154,0.9001,0.199
+"Immigration + speciation (standardised log rates)","log.SA + Northness",2,0.0946837098519587,0.0821098724887914,0.511,0.9098,0.19
+"Immigration + speciation (standardised log rates)","Shape + Northness + Eastness",3,0.0998901779095101,0.0810067550684508,0.7922,0.9126,0.188
+"Immigration + speciation (standardised log rates)","log.SA",1,0.0854164438084532,0.0791089710071321,0.2345,0.9173,0.183
+"Immigration + speciation (standardised log rates)","Shape",1,0.0729725476107464,0.066579254835648,0.298,0.9425,0.154
+"Immigration + speciation (standardised log rates)","Shape + Northness",2,0.0766757084795264,0.0638517599861864,0.6413,0.9469,0.148
+"Immigration + speciation (standardised log rates)","Eastness",1,0.061899529106756,0.0554298706868026,0.3495,0.9612,0.128
+"Immigration + speciation (standardised log rates)","Northness + Eastness",2,0.0653661302769458,0.0523851043085701,0.7084,0.9658,0.121
+"Immigration + speciation (standardised log rates)","Northness",1,0.00414498001340132,-0.00272298564167861,0.9206,1,-0.006

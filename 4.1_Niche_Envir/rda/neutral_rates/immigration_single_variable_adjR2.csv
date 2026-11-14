@@ -1,0 +1,17 @@
+"Response","Variable","adjR2"
+"Immigration rate (log)","log.Depth.surface",0.169
+"Immigration rate (log)","Shape",0.126
+"Immigration rate (log)","log.Depth",0.113
+"Immigration rate (log)","Eastness",0.092
+"Immigration rate (log)","log.Volume",0.047
+"Immigration rate (log)","Size",0.037
+"Immigration rate (log)","Air.Temp",0.012
+"Immigration rate (log)","Air.Temp.max",0.009
+"Immigration rate (log)","Soil.Temp4",0.009
+"Immigration rate (log)","Air.Temp.min",0.007
+"Immigration rate (log)","Moisture",0.005
+"Immigration rate (log)","Northness",0.001
+"Immigration rate (log)","Drought_days",-0.001
+"Immigration rate (log)","log.SA",-0.005
+"Immigration rate (log)","log.Max.Lum",-0.005
+"Immigration rate (log)","Rainfall",-0.007

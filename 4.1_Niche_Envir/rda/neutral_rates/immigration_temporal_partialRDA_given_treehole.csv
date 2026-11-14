@@ -1,0 +1,8 @@
+"Response","Term","Df","Variance","F","Pr..F."
+"Immigration rate (log)","Moisture",1,8.73278829519042e-05,0.0917890874096315,0.753
+"Immigration rate (log)","log.Max.Lum",1,6.14774084825576e-06,0.00646180238221388,0.93
+"Immigration rate (log)","Air.Temp.max",1,0.000207781136211102,0.218395777260023,0.652
+"Immigration rate (log)","Air.Temp.min",1,0.000108440187501682,0.113979928435809,0.759
+"Immigration rate (log)","Rainfall",1,0.000115338478186094,0.12123062300443,0.735
+"Immigration rate (log)","Drought_days",1,0.000190269382317407,0.199989423475749,0.593
+"Immigration rate (log)","Residual",131,0.124633036339558,NA,NA

@@ -1,0 +1,17 @@
+"Response","Variable","adjR2"
+"Immigration + speciation (standardised log rates)","log.Depth",0.192
+"Immigration + speciation (standardised log rates)","log.Volume",0.154
+"Immigration + speciation (standardised log rates)","Size",0.145
+"Immigration + speciation (standardised log rates)","log.Depth.surface",0.117
+"Immigration + speciation (standardised log rates)","log.SA",0.079
+"Immigration + speciation (standardised log rates)","Shape",0.067
+"Immigration + speciation (standardised log rates)","Eastness",0.055
+"Immigration + speciation (standardised log rates)","Moisture",0.03
+"Immigration + speciation (standardised log rates)","Drought_days",0.018
+"Immigration + speciation (standardised log rates)","Air.Temp.min",0.01
+"Immigration + speciation (standardised log rates)","Air.Temp",0.009
+"Immigration + speciation (standardised log rates)","Air.Temp.max",0.008
+"Immigration + speciation (standardised log rates)","Soil.Temp4",0.008
+"Immigration + speciation (standardised log rates)","Northness",-0.003
+"Immigration + speciation (standardised log rates)","log.Max.Lum",-0.004
+"Immigration + speciation (standardised log rates)","Rainfall",-0.005

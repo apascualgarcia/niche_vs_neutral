@@ -1,0 +1,12 @@
+"Response","Analysis","adjR2"
+"CLR community (all ASVs)","Tree-hole identity",0.527501352882982
+"CLR community (all ASVs)","Size",0.132927588254585
+"CLR community (all ASVs)","Shape",0.0625108857581138
+"CLR community (all ASVs)","Size + Shape",0.198764313812946
+"CLR community (all ASVs)","Size + Shape + Eastness",0.250358759857768
+"CLR community (all ASVs)","Time-varying (unique)",0.0320786357506661
+"Aitchison PCoA1-3","Tree-hole identity",0.900835640120195
+"Aitchison PCoA1-3","Size",0.316412389500128
+"Aitchison PCoA1-3","Shape",0.139184045206155
+"Aitchison PCoA1-3","Size + Shape",0.463704176246846
+"Aitchison PCoA1-3","Size + Shape + Eastness",0.521233819069654

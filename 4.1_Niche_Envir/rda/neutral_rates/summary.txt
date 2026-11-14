@@ -1,0 +1,154 @@
+Neutral-model rates (NMGS, K = 10) as responses of environmental variables
+Samples: 147 ; tree holes: 10; metacommunities: 10
+Correlation of log immigration and log speciation across samples: 0.151 
+Dropped for VIF > 10: Air.Temp Soil.Temp4 
+
+===== Immigration + speciation (standardised log rates) =====
+Forward selection: Size  adj. R2 = 0.145 (full model: 0.216 )
+Ceilings (adj. R2): tree hole 0.432 ; metacommunity 0.646 
+Morphology combinations (tree-hole permutations):
+                         Variables     adjR2 P.treehole.perm
+           Size + Shape + Eastness 0.2294128          0.1897
+                      Size + Shape 0.2232525          0.0794
+          Size + Shape + Northness 0.2184924          0.2045
+              log.Depth + Eastness 0.2115934          0.0962
+  log.Depth + Northness + Eastness 0.2094793          0.2401
+                         log.Depth 0.1919389          0.0403
+             log.Volume + Eastness 0.1906835          0.1254
+ log.Volume + Northness + Eastness 0.1903172          0.3036
+             log.Depth + Northness 0.1899516          0.1332
+       Size + Northness + Eastness 0.1851194          0.3238
+ P.selection.corrected Fraction.of.treehole
+                0.3531                0.531
+                0.3796                0.517
+                0.3981                0.506
+                0.4302                0.490
+                0.4391                0.485
+                0.5122                0.445
+                0.5187                0.442
+                0.5205                0.441
+                0.5219                0.440
+                0.5430                0.429
+Highest adj. R2: Size Shape Eastness ; morphology used downstream (a priori): Size Shape 
+Time-varying variables | tree hole (within-tree-hole permutations):
+         Term  Df     Variance          F Pr..F.
+     Moisture   1 0.0005349914 0.06890861  0.900
+  log.Max.Lum   1 0.0015795315 0.20344875  0.736
+ Air.Temp.max   1 0.0022805768 0.29374564  0.644
+ Air.Temp.min   1 0.0009088405 0.11706158  0.849
+     Rainfall   1 0.0090935369 1.17127686  0.299
+ Drought_days   1 0.0032428966 0.41769553  0.406
+     Residual 131 1.0170552985         NA     NA
+Variation partitioning, morphology vs time-varying (adj. R2):
+                Df Adj.R.squared
+[a] = X1|X2      2         0.185
+[b] = X2|X1      6        -0.009
+[c]              0         0.038
+[d] = Residuals NA         0.786
+Variation partitioning, tree hole vs time-varying (adj. R2):
+                Df Adj.R.squared
+[a] = X1|X2      9         0.404
+[b] = X2|X1      6         0.002
+[c]              0         0.028
+[d] = Residuals NA         0.567
+
+===== Immigration rate (log) =====
+Forward selection: Shape Size  adj. R2 = 0.176 (full model: 0.177 )
+Ceilings (adj. R2): tree hole 0.255 ; metacommunity 0.291 
+Morphology combinations (tree-hole permutations):
+                                Variables     adjR2 P.treehole.perm
+                  Size + Shape + Eastness 0.1920363          0.0711
+             log.Depth.surface + Eastness 0.1862626          0.0334
+ log.Depth.surface + Northness + Eastness 0.1818204          0.1040
+                             Size + Shape 0.1757167          0.0431
+                 Size + Shape + Northness 0.1709606          0.1277
+                        log.Depth.surface 0.1686317          0.0153
+            log.Depth.surface + Northness 0.1658811          0.0639
+                     log.Depth + Eastness 0.1569786          0.0709
+         log.Depth + Northness + Eastness 0.1559712          0.1741
+                         Shape + Eastness 0.1555859          0.0835
+ P.selection.corrected Fraction.of.treehole
+                0.1742                0.754
+                0.1974                0.731
+                0.2188                0.714
+                0.2469                0.690
+                0.2698                0.671
+                0.2790                0.662
+                0.2933                0.651
+                0.3368                0.616
+                0.3426                0.612
+                0.3443                0.611
+Highest adj. R2: Size Shape Eastness ; morphology used downstream (a priori): Size Shape 
+Time-varying variables | tree hole (within-tree-hole permutations):
+         Term  Df     Variance           F Pr..F.
+     Moisture   1 8.732788e-05 0.091789087  0.753
+  log.Max.Lum   1 6.147741e-06 0.006461802  0.930
+ Air.Temp.max   1 2.077811e-04 0.218395777  0.652
+ Air.Temp.min   1 1.084402e-04 0.113979928  0.759
+     Rainfall   1 1.153385e-04 0.121230623  0.735
+ Drought_days   1 1.902694e-04 0.199989423  0.593
+     Residual 131 1.246330e-01          NA     NA
+Variation partitioning, morphology vs time-varying (adj. R2):
+                Df Adj.R.squared
+[a] = X1|X2      2         0.167
+[b] = X2|X1      6        -0.012
+[c]              0         0.009
+[d] = Residuals NA         0.836
+Variation partitioning, tree hole vs time-varying (adj. R2):
+                Df Adj.R.squared
+[a] = X1|X2      9         0.250
+[b] = X2|X1      6        -0.008
+[c]              0         0.005
+[d] = Residuals NA         0.754
+
+Immigration: environment vs metacommunity (adj. R2):
+                Df Adj.R.squared
+[a] = X1|X2      2        -0.009
+[b] = X2|X1      9         0.106
+[c]              0         0.185
+[d] = Residuals NA         0.718
+
+Mixed model for log immigration (random intercept per tree hole):
+                 Value  Std.Error  DF    t-value       p-value
+(Intercept) 6.99980492 0.05468902 137 127.992866 1.852373e-144
+Size        0.09008512 0.05034080   7   1.789505  1.166622e-01
+Shape       0.14926323 0.05213732   7   2.862887  2.423730e-02
+Intraclass correlation (tree hole): 0.124 
+
+Speciation vs metacommunity means (Spearman, n = 10):
+          Variable    rho      P  P.BH
+      Drought_days -0.632 0.0498 0.407
+          Moisture  0.576 0.0878 0.407
+         Northness -0.497 0.1440 0.407
+          Air.Temp  0.479 0.1660 0.407
+      Air.Temp.max  0.455 0.1910 0.407
+            log.SA  0.399 0.2540 0.407
+ log.Depth.surface  0.399 0.2540 0.407
+      Air.Temp.min  0.394 0.2630 0.407
+          Eastness -0.387 0.2700 0.407
+        Soil.Temp4  0.382 0.2790 0.407
+              Size  0.362 0.3040 0.407
+        log.Volume  0.350 0.3220 0.407
+         log.Depth  0.344 0.3310 0.407
+       log.Max.Lum -0.261 0.4700 0.537
+             Shape  0.227 0.5280 0.563
+          Rainfall  0.176 0.6320 0.632
+
+Drought prevalence vs tree-hole morphology (Pearson, n = 10 tree holes):
+     Response          Variable      r        P r.without.TH1 P.without.TH1
+  Drought.max         log.Depth -0.858 0.001480        -0.795        0.0104
+  Drought.max            log.SA -0.491 0.149000        -0.338        0.3740
+  Drought.max        log.Volume -0.754 0.011800        -0.591        0.0937
+  Drought.max log.Depth.surface -0.692 0.026500        -0.477        0.1950
+  Drought.max              Size -0.728 0.016900        -0.557        0.1200
+  Drought.max             Shape -0.488 0.153000        -0.254        0.5100
+  Drought.max         Northness  0.163 0.652000        -0.185        0.6340
+  Drought.max          Eastness  0.264 0.461000         0.384        0.3070
+ Fraction.dry         log.Depth -0.872 0.000991        -0.749        0.0201
+ Fraction.dry            log.SA -0.386 0.270000        -0.162        0.6760
+ Fraction.dry        log.Volume -0.713 0.020500        -0.466        0.2060
+ Fraction.dry log.Depth.surface -0.827 0.003150        -0.669        0.0488
+ Fraction.dry              Size -0.679 0.030800        -0.423        0.2570
+ Fraction.dry             Shape -0.646 0.043500        -0.462        0.2110
+ Fraction.dry         Northness  0.123 0.735000        -0.328        0.3890
+ Fraction.dry          Eastness  0.161 0.657000         0.287        0.4530

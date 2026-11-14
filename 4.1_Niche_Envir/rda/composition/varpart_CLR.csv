@@ -1,0 +1,9 @@
+"Partition","Fraction","Df","R.squared","Adj.R.squared","Testable"
+"Morphology vs time-varying","[a] = X1|X2",2,NA,0.171567482618252,TRUE
+"Morphology vs time-varying","[b] = X2|X1",3,NA,0.0320786357506661,TRUE
+"Morphology vs time-varying","[c]",0,NA,0.0271968311946942,FALSE
+"Morphology vs time-varying","[d] = Residuals",NA,NA,0.769157050436388,FALSE
+"Tree hole vs time-varying","[a] = X1|X2",9,NA,0.498566225645454,TRUE
+"Tree hole vs time-varying","[b] = X2|X1",3,NA,0.0303403397078342,TRUE
+"Tree hole vs time-varying","[c]",0,NA,0.028935127237526,FALSE
+"Tree hole vs time-varying","[d] = Residuals",NA,NA,0.442158307409185,FALSE

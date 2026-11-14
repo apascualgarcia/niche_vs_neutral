@@ -1,0 +1,4 @@
+"Response","Step","R2.adj","Df","AIC","F","Pr..F."
+"Immigration rate (log)","+ Shape",0.126311281641666,1,-266.45337149455,22.1075715322671,0.001
+"Immigration rate (log)","+ Size",0.175716680896579,1,-274.027524550952,9.69092304300751,0.003
+"Immigration rate (log)","<All variables>",0.177350678270907,NA,NA,NA,NA
