@@ -4,13 +4,14 @@ Data and code used for the paper:
 
 
  _Identifying the metacommunity scale reconciles deterministic and stochastic assembly in a natural mainland–island microbial system_
+ 
 Javier Cuadrado Corz, Josep Ramoneda, Diego Alcón, Thomas Bell & Alberto Pascual-García.
 
 ---
 
 ## Contents
 
-1. [Pipeline at a glance](#pipeline-at-a-glance)
+1. [Pipeline overview](#pipeline-overview)
 2. [Getting the raw data](#getting-the-raw-data)
 3. [Reproducing the analysis (`make`)](#reproducing-the-analysis-make)
 4. [Requirements](#requirements)
@@ -22,7 +23,7 @@ Javier Cuadrado Corz, Josep Ramoneda, Diego Alcón, Thomas Bell & Alberto Pascua
 
 ---
 
-## Pipeline at a glance
+## Pipeline overview
 
 | Step | Folder | What happens |
 |---|---|---|
