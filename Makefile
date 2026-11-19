@@ -66,6 +66,19 @@ help:
 	@echo "  rda_rates        RDA/mixed models: environment vs immigration and speciation rates (4.1_Niche_Envir/rda/neutral_rates)"
 	@echo "  picrust          [external] PICRUSt2 functional prediction"
 	@echo "  stamp            convert the KEGG L3 biom table to STAMP format"
+	@echo "  interactions         everything except the external steps"
+	@echo "  sparcc_tables        ASV tables per metacommunity / tree hole"
+	@echo "  fastspar             [external, hours] FastSpar + edge lists"
+	@echo "  sparcc_cordist       Fig. 5B + correlation tables"
+	@echo "  sparcc_overlap       Fig. 5A"
+	@echo "  sparcc_thresholds    supplementary threshold figures"
+	@echo "  indval               IndVal of TH1 vs TH7 in M7"
+	@echo "  ranking              ranking-based characteristic ASVs"
+	@echo "  abundance_dist       Fig. 5D (figures without legend; legends in separate PDFs)"
+	@echo "  networks_M7          M7 and TH1/TH7 networks (functionInk input)"
+	@echo "  functionink          [external] prints the functionInk commands"
+	@echo "  treehole_membership  tree-hole membership for Cytoscape"
+	@echo "  networks_M7_overlap  overlap heatmaps of the M7 / TH1-TH7 networks (full + reduced)"
 	@echo "  all              every non-external target"
 	@echo "Variables: K=$(K) RSCRIPT=$(RSCRIPT) PYTHON=$(PYTHON) NMGS=$(NMGS) CORES=$(CORES)"
 
@@ -233,3 +246,101 @@ stamp: 4.2_Niche_PiCRUST/KEGG_pathways_out/KEGGs_vs_samples.L3.spf
 4.2_Niche_PiCRUST/KEGG_pathways_out/KEGGs_vs_samples.L3.spf: 4.2_Niche_PiCRUST/KEGG_pathways_out/KEGGs_vs_samples.L3.biom \
 		| $(SRC)/biom_to_stamp.py
 	$(PYTHON) $(SRC)/biom_to_stamp.py -m KEGG_Pathways $< > $@
+
+# --- 4.3 Interactions (SparCC networks) ----------------------------------------------
+# To merge into the Makefile of niche_vs_neutral: paste this block after the 4.2 section,
+# add the targets below to .PHONY and `help`, and add `interactions` to `all` if wanted
+# (the full chain needs FastSpar and takes many hours; see README, 4.3).
+INTER   := 4.3_Niche_Interactions
+SPARCC  := $(INTER)/SparCC
+COR     := $(INTER)/correlations
+IFIG    := $(INTER)/figures
+NET7    := $(INTER)/networks_M7
+FINK    := $(NET7)/functionInk
+META_K10 := $(META)/Metadata_singleTree_wDirich-K10.tsv
+SPARCC_CLUSTERS := $(addprefix Meta_,1 2 3 4 5 6 7 8 10) $(addprefix Hole_,1 2 3 4 5 6 7 8 9 10) Total
+SPARCC_EDGES := $(foreach c,$(SPARCC_CLUSTERS),$(SPARCC)/$(c)/correlations.edgelist)
+
+.PHONY: interactions sparcc_tables fastspar sparcc_cordist sparcc_overlap sparcc_thresholds \
+        indval ranking abundance_dist networks_M7 functionink treehole_membership networks_M7_overlap
+
+interactions: sparcc_cordist sparcc_overlap sparcc_thresholds abundance_dist networks_M7 \
+              treehole_membership networks_M7_overlap
+
+sparcc_tables: $(SPARCC)/Total/data.tsv
+$(SPARCC)/Total/data.tsv: $(DADA)/$(OTU).tsv $(META_K10) | $(SRC)/sparcc_split_tables.R
+	$(RSCRIPT) $(SRC)/sparcc_split_tables.R
+
+# [external] FastSpar; cor.tsv and pvalues.tsv are not committed (too large)
+fastspar: $(SPARCC_EDGES)
+$(SPARCC)/%/correlations.edgelist: $(SPARCC)/%/data.tsv
+	@command -v fastspar >/dev/null || { echo "[external] fastspar not found (github.com/scwatts/fastspar)"; exit 1; }
+	bash $(SRC)/sparcc_run_fastspar.sh $*
+
+# Fig. 5B; also the correlation tables used downstream (large, not committed) and the
+# metacommunity legend shared by Fig. 5B and the threshold figures
+sparcc_cordist: $(COR)/Correlation_zscore_thres.tsv
+$(COR)/Correlations.tsv $(COR)/Correlation_zscore_thres.tsv $(COR)/Correlation_zscore_thres_holes.tsv \
+$(IFIG)/legends/legend_metacommunity.pdf &: \
+		$(SPARCC_EDGES) | $(SRC)/sparcc_correlation_distribution.R $(SRC)/legend_utils.R
+	$(RSCRIPT) $(SRC)/sparcc_correlation_distribution.R
+
+# Fig. 5A
+sparcc_overlap: $(IFIG)/correlations/Heatmap_overlap.pdf
+$(IFIG)/correlations/Heatmap_overlap.pdf $(IFIG)/correlations/Heatmap_overlap_Holes.pdf &: \
+		$(SPARCC_EDGES) | $(SRC)/sparcc_network_overlap.R
+	$(RSCRIPT) $(SRC)/sparcc_network_overlap.R
+
+sparcc_thresholds: $(IFIG)/thresholds/Threshold_ncor.pdf $(IFIG)/thresholds/nsamples_ncor_T03.pdf \
+                   $(IFIG)/thresholds/ncors_overlap.pdf $(IFIG)/thresholds/Heatmap_overlap_1e+05.pdf
+$(INTER)/thresholds/Thres_cors.tsv: $(COR)/Correlations.tsv $(META_K10) | $(SRC)/sparcc_threshold_table.R
+	$(RSCRIPT) $(SRC)/sparcc_threshold_table.R
+$(IFIG)/thresholds/Threshold_ncor.pdf: $(COR)/Correlations.tsv $(META_K10) | $(SRC)/sparcc_threshold_ncor.R $(SRC)/legend_utils.R
+	$(RSCRIPT) $(SRC)/sparcc_threshold_ncor.R
+$(IFIG)/thresholds/nsamples_ncor_T03.pdf: $(COR)/Correlations.tsv $(META_K10) | $(SRC)/sparcc_nsamples_ncor.R $(SRC)/legend_utils.R
+	$(RSCRIPT) $(SRC)/sparcc_nsamples_ncor.R
+$(IFIG)/thresholds/ncors_overlap.pdf: $(COR)/Correlations.tsv $(INTER)/thresholds/Thres_cors.tsv | $(SRC)/sparcc_overlap_vs_ncor.R \
+		$(SRC)/legend_utils.R
+	$(RSCRIPT) $(SRC)/sparcc_overlap_vs_ncor.R
+$(IFIG)/thresholds/Heatmap_overlap_1e+05.pdf: $(COR)/Correlations.tsv $(INTER)/thresholds/Thres_cors.tsv \
+		| $(SRC)/sparcc_overlap_heatmaps_ncor.R
+	$(RSCRIPT) $(SRC)/sparcc_overlap_heatmaps_ncor.R
+
+# Tree-hole characteristic ASVs of M7 (Fig. 5D)
+indval: $(INTER)/indicator_species/indval_M7.csv
+$(INTER)/indicator_species/indval_M7.csv: $(DADA)/$(OTU).tsv $(META_K10) | $(SRC)/indval_treeholes_M7.R
+	$(RSCRIPT) $(SRC)/indval_treeholes_M7.R
+ranking: $(INTER)/indicator_species/characteristic_ASVs_M7.tsv
+$(INTER)/indicator_species/characteristic_ASVs_M7.tsv: $(DADA)/$(OTU).tsv $(META_K10) $(INTER)/indicator_species/indval_M7.csv \
+		| $(SRC)/ranking_treeholes_M7.R $(SRC)/legend_utils.R
+	$(RSCRIPT) $(SRC)/ranking_treeholes_M7.R
+abundance_dist: $(IFIG)/indicator_species/Met_Hole_Dist_7.pdf
+$(IFIG)/indicator_species/Met_Hole_Dist_7.pdf: $(DADA)/$(OTU).tsv $(META_K10) $(INTER)/indicator_species/indval_M7.csv \
+		| $(SRC)/abundance_distribution_treeholes_M7.R $(SRC)/legend_utils.R
+	$(RSCRIPT) $(SRC)/abundance_distribution_treeholes_M7.R
+
+# Networks of M7 and of TH1 + TH7 (Fig. 5C, Suppl. Fig.)
+networks_M7: $(NET7)/network_7_Indval.tsv
+$(NET7)/network_7.tsv $(NET7)/network_7_Indval.tsv $(NET7)/network_holes.tsv &: \
+		$(COR)/Correlation_zscore_thres.tsv $(COR)/Correlation_zscore_thres_holes.tsv \
+		$(INTER)/indicator_species/characteristic_ASVs_M7.tsv | $(SRC)/networks_M7.R
+	$(RSCRIPT) $(SRC)/networks_M7.R
+
+functionink:
+	@echo "[external] functionInk (github.com/apascualgarcia/functionInk), run in"
+	@echo "$(FINK)/network_7_Indval and $(FINK)/network_holes (see README, 4.3):"
+	@echo "  NodeSimilarity.pl -w 1 -d 0 -t 1 -f ../../<net>.tsv"
+	@echo "  NodeLinkage.pl -fn ../../<net>.tsv -fs Nodes-Similarities_<net>.tsv"
+	@echo "  NodeLinkage.pl -fn ../../<net>.tsv -fs Nodes-Similarities_<net>.tsv -s step -v <step>   (192 / 580)"
+
+treehole_membership: $(FINK)/network_holes/Clustering_holes.tsv
+$(FINK)/network_holes/Clustering_holes.tsv: $(NET7)/network_holes.tsv \
+		$(FINK)/network_holes/Partition-NL_Average_StopStep-580_network_holes.tsv | $(SRC)/network_treeholes_membership.R
+	$(RSCRIPT) $(SRC)/network_treeholes_membership.R
+
+# Overlap heatmaps of the M7 and TH1/TH7 networks (full and reduced to the characteristic ASVs)
+networks_M7_overlap: $(IFIG)/networks_M7/Heatmap_overlap.pdf
+$(IFIG)/networks_M7/Heatmap_overlap.pdf $(IFIG)/networks_M7/Heatmap_overlap_reduced.pdf &: \
+		$(NET7)/network_7.tsv $(NET7)/network_7_Indval.tsv $(NET7)/network_holes.tsv \
+		$(INTER)/indicator_species/characteristic_ASVs_M7.tsv | $(SRC)/networks_M7_overlap.R
+	$(RSCRIPT) $(SRC)/networks_M7_overlap.R
