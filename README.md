@@ -502,8 +502,8 @@ Then run `make treehole_membership`.
 #### Cytoscape (step 4.3)
 The networks were drawn by hand in Cytoscape (sessions in `4.3_Niche_Interactions/networks_M7/cytoscape/`). The nodes were coloured using `indicator_species/characteristic_ASVs_M7.tsv`, `functionInk/network_holes/Clustering_holes.tsv` and `cytoscape/taxonomy.list`.
 * `Network_7_IndVal_cor03.cys` → Fig. 5C (`figures/networks_M7/network_7_Indval.pdf`)
-* `Network_holes_associations03.cys` → Suppl. Fig. A (`network_holes.pdf`)
-* `Network_holes_1_and_7.cys` → Suppl. Fig. B, the intersection network (`network_holes_as.pdf`)
+* `Network_holes_associations03.cys` → (`network_holes.pdf`)
+* `Network_holes_1_and_7.cys` → The intersection network (`network_holes_as.pdf`)
 
 The panels were assembled in Inkscape; the composed figures are not in the repository.
 
