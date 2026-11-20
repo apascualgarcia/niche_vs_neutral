@@ -4,14 +4,13 @@ Data and code used for the paper:
 
 
  _Identifying the metacommunity scale reconciles deterministic and stochastic assembly in a natural mainland–island microbial system_
- 
 Javier Cuadrado Corz, Josep Ramoneda, Diego Alcón, Thomas Bell & Alberto Pascual-García.
 
 ---
 
 ## Contents
 
-1. [Pipeline overview](#pipeline-overview)
+1. [Pipeline at a glance](#pipeline-at-a-glance)
 2. [Getting the raw data](#getting-the-raw-data)
 3. [Reproducing the analysis (`make`)](#reproducing-the-analysis-make)
 4. [Requirements](#requirements)
@@ -23,7 +22,7 @@ Javier Cuadrado Corz, Josep Ramoneda, Diego Alcón, Thomas Bell & Alberto Pascua
 
 ---
 
-## Pipeline overview
+## Pipeline at a glance
 
 | Step | Folder | What happens |
 |---|---|---|
@@ -33,7 +32,8 @@ Javier Cuadrado Corz, Josep Ramoneda, Diego Alcón, Thomas Bell & Alberto Pascua
 | 3.2 | `3.2_Neutral_Stegen` | βNTI / Raup-Crick null models (Stegen et al.) → pairwise assembly processes |
 | 4.1 | `4.1_Niche_Envir` | Composition vs environment (PCoA on Aitchison distances, envfit, RDA) |
 | 4.2 | `4.2_Niche_PiCRUST*` | Predicted functions (PICRUSt2) |
-| 4.3 | `4.3_Niche_Interactions` | Co-occurrence network (Cytoscape session `Net.cys`) |
+| 4.3 | `4.3_Niche_Interactions` | SparCC networks per metacommunity and per tree hole (FastSpar); overlap between
+networks; tree-hole characteristic ASVs of M7 (IndVal and ranking);  Co-occurrence network (Cytoscape session) |
 
 All code is in `src/`. Each data folder holds the outputs of its step, and most have a `figures/` subfolder.
 
@@ -115,6 +115,21 @@ make split K=7       # targets that depend on the number of Dirichlet components
 | `rda_rates` | `rda_neutral_rates_environment.R` | `4.1_Niche_Envir/rda/neutral_rates/*`, `4.1_Niche_Envir/rda/results_summary.csv` |
 | `picrust` **[external]** | PICRUSt2 | `4.2_Niche_PiCRUST*/` |
 | `stamp` | `biom_to_stamp.py` | `4.2_Niche_PiCRUST/KEGG_pathways_out/KEGGs_vs_samples.L3.spf` |
+| `sparcc_tables` | `sparcc_split_tables.R` | `4.3_Niche_Interactions/SparCC/*/data.tsv` |
+| `fastspar` **[external]** | `sparcc_run_fastspar.sh`, `sparcc_edgelist.R` | `4.3_Niche_Interactions/SparCC/*/{cor.tsv,pvalues.tsv,correlations.edgelist}` |
+| `sparcc_cordist` | `sparcc_correlation_distribution.R` | `4.3_Niche_Interactions/correlations/*`, `4.3_Niche_Interactions/figures/correlations/correlation_dist.pdf` (Fig. 4B) |
+| `sparcc_overlap` | `sparcc_network_overlap.R` | `4.3_Niche_Interactions/figures/correlations/Heatmap_overlap{,_Holes}.pdf` (Fig. 4A) |
+| `sparcc_thresholds` | `sparcc_threshold_table.R`, `sparcc_threshold_ncor.R`, `sparcc_nsamples_ncor.R`, `sparcc_overlap_vs_ncor.R`, `sparcc_overlap_heatmaps_ncor.R` | `4.3_Niche_Interactions/thresholds/Thres_cors.tsv`, `4.3_Niche_Interactions/figures/thresholds/*` |
+| `indval` | `indval_treeholes_M7.R` | `4.3_Niche_Interactions/indicator_species/indval_M7.csv` |
+| `ranking` | `ranking_treeholes_M7.R` | `4.3_Niche_Interactions/indicator_species/characteristic_ASVs_M7.tsv`, `4.3_Niche_Interactions/figures/indicator_species/DifRanking*` |
+| `abundance_dist` | `abundance_distribution_treeholes_M7.R` | `4.3_Niche_Interactions/figures/indicator_species/Met_Hole_Dist_7.pdf` (Fig. 4D) |
+| `networks_M7` | `networks_M7.R` | `4.3_Niche_Interactions/networks_M7/{network_7,network_7_Indval,network_holes}.tsv` |
+| `functionink` **[external]** | functionInk | `4.3_Niche_Interactions/networks_M7/functionInk/*/` |
+| `treehole_membership` | `network_treeholes_membership.R` | `4.3_Niche_Interactions/networks_M7/functionInk/network_holes/Clustering_holes.tsv` |
+| `networks_M7_overlap` | `networks_M7_overlap.R` | `4.3_Niche_Interactions/figures/networks_M7/Heatmap_overlap{,_reduced}.pdf` |
+
+`make interactions` runs all the non-external targets of step 4.3. The full chain needs
+FastSpar and takes many hours (1000 bootstraps per network).
 
 ---
 
@@ -126,7 +141,8 @@ make split K=7       # targets that depend on the number of Dirichlet components
   * CRAN: `here`, `vegan`, `permute`, `nlme`, `compositions`, `ape`, `ggplot2`, `ggrepel`,
     `ggpmisc`, `ggprism`, `patchwork`, `RColorBrewer`, `colorspace`, `plotly`, `Hmisc`,
     `tidyverse` (includes `dplyr`, `tidyr`, `tibble`, `readr`, `purrr`, `stringr`),
-    `reshape2`, `data.table`, `stringi`, `rprojroot`, `ggpicrust2`
+    `reshape2`, `data.table`, `stringi`, `rprojroot`, `ggpicrust2`, `gplots`, `viridisLite`,
+    `indicspecies`, `nleqslv`, `fitdistrplus`, `fitteR`, `flexsurv`, `goftest`
   * The legacy scripts also use `microbiome`.
 
   All scripts use `here`. Other packages, by script:
@@ -148,8 +164,16 @@ make split K=7       # targets that depend on the number of Dirichlet components
   | `rda_composition_environment.R` (+ `rda_functions.R`) | `vegan`, `permute`, `phyloseq`, `ggplot2`, `ggrepel` |
   | `rda_neutral_rates_environment.R` (+ `rda_functions.R`) | `vegan`, `permute`, `nlme`, `phyloseq`, `ggplot2` |
   | `picrust_analysis.R` | `ggpicrust2`, `ALDEx2`, `tidyverse`, `ggprism`, `patchwork`, `data.table`, `rprojroot` |
+  | `sparcc_split_tables.R`, `sparcc_threshold_table.R`, `sparcc_threshold_ncor.R`, `sparcc_nsamples_ncor.R`, `networks_M7.R`, `network_treeholes_membership.R` | `tidyverse` |
+  | `sparcc_edgelist.R` | `dplyr` |
+  | `sparcc_correlation_distribution.R` | `tidyverse`, `RColorBrewer`, `parallel` |
+  | `sparcc_network_overlap.R`, `sparcc_overlap_vs_ncor.R`, `sparcc_overlap_heatmaps_ncor.R`, `networks_M7_overlap.R` | `tidyverse`, `gplots`, `viridisLite` |
+  | `indval_treeholes_M7.R` | `indicspecies`, `vegan`, `gplots`, `dplyr` |
+  | `ranking_treeholes_M7.R` | `indicspecies`, `vegan`, `gplots`, `tidyverse` |
+  | `abundance_distribution_treeholes_M7.R` | `tidyverse`, `nleqslv`, `fitdistrplus`, `fitteR`, `flexsurv`, `goftest` |
+  | `legend_utils.R` | `ggplot2`, `grid` |
 * **Python 3**: `pandas`, `matplotlib`, `numpy`, and `biom-format` for `biom_to_stamp.py`
-* **External tools**: `idemp`, `cutadapt`, a SILVA training set, the Dirichlet multinomial mixtures code, NMGS and PICRUSt2; see [External software](#external-software)
+* **External tools**: `idemp`, `cutadapt`, a SILVA training set, the Dirichlet multinomial mixtures code, NMGS, PICRUSt2, FastSpar (with GNU `parallel`), functionInk and Cytoscape; see [External software](#external-software)
 
 Software versions were not recorded for the published results, except for the sequence
 processing (DADA2 v1.32.0, cutadapt v4.6, SILVA v138.1; run on a collaborator's
@@ -298,11 +322,110 @@ Differential abundance of predicted KEGG level-3 pathways between metacommunitie
 Converts a BIOM table into a STAMP profile (Morgan Langille, GPL). For example:
 `python3 src/biom_to_stamp.py -m KEGG_Pathways KEGGs_vs_samples.L3.biom > KEGGs_vs_samples.L3.spf`
 
+#### `sparcc_split_tables.R`
+Splits the ASV table into one table per metacommunity (K = 10, skipping components with only one sample) and one per tree hole. A tree-hole table holds **all** the samples of that tree hole, whatever their metacommunity. It also writes the whole table as `Total` and `Total_Holes`. Counts are not rescaled.
+* **Input:** `1_dada2/otu_table_treeholes_dada2_renamed_clean_red.tsv`, `1_samples_properties/Metadata_singleTree_wDirich-K10.tsv`
+* **Output:** `4.3_Niche_Interactions/SparCC/{Meta_*,Hole_*,Total,Total_Holes}/data.tsv`
+
+#### `sparcc_run_fastspar.sh` and `sparcc_edgelist.R`
+Runs SparCC with FastSpar on every table: the correlations, 1000 bootstraps (5 iterations each), and pseudo p-values from 1000 permutations. `sparcc_edgelist.R` then keeps the pairs with p ≤ 0.001. Usage: `bash src/sparcc_run_fastspar.sh [Meta_7 Hole_1 ...]` (all the tables if none is given; `THREADS=30` by default). With `EDGELIST_ONLY=1`, only the edge lists are redone.
+* **Input:** `4.3_Niche_Interactions/SparCC/<cluster>/data.tsv`
+* **Output:** `4.3_Niche_Interactions/SparCC/<cluster>/{cor.tsv,pvalues.tsv,correlations.edgelist,fastspar.log}`. None of the `SparCC/` folder is committed. `correlations.edgelist` lists every pair in both orientations.
+
+#### `sparcc_correlation_distribution.R`
+Collects the SparCC scores of each metacommunity, plus the Pearson correlations of the relative abundances for comparison, and computes their z-score within each metacommunity. It plots their density (Fig. 5B, threshold at |r| = 0.3) and their cumulative distribution, and counts the links above |r| = 0.25 and 0.5, and above |z| = 2–10. It does the same for the tree-hole networks.
+* **Input:** `4.3_Niche_Interactions/SparCC/{Meta_*,Hole_*}/{correlations.edgelist,data.tsv}`
+* **Output:** in `4.3_Niche_Interactions/correlations/`:
+  * `Correlations{,_holes}.tsv`: all the scores. Not committed.
+  * `Correlation_zscore_thres{,_holes}.tsv`: all the SparCC scores with their z-score. Despite the name, they are not filtered. Not committed.
+  * Counts per metacommunity: `Correlation_Meta_Com_*.tsv`, `Positive/Negative_correlations.tsv`.
+  * Figures in `4.3_Niche_Interactions/figures/correlations/`: `correlation_dist.pdf` (Fig. 5B), `cumulative_distribution_cor.pdf`, and others.
+  * `4.3_Niche_Interactions/figures/legends/legend_metacommunity.pdf`: legend of Fig. 5B, shared by every figure coloured by metacommunity.
+* The block that writes `Correlation_zscore_thres.tsv`, `Correlation_Meta_Com_zscore_thres.tsv` and `Correlations_zscore_thres.pdf` was missing from the original script and has been reconstructed.
+
+#### `sparcc_network_overlap.R`
+Szymkiewicz–Simpson overlap of the links of every pair of metacommunity networks, using all the significant links. Each cell shows the number of links in common (Fig. 5A). It does the same for the tree-hole networks.
+* **Input:** `4.3_Niche_Interactions/SparCC/{Meta_*,Hole_*,Total}/correlations.edgelist`
+* **Output:** `4.3_Niche_Interactions/figures/correlations/Heatmap_overlap.pdf` (Fig. 5A), `Heatmap_overlap_Holes.pdf`
+
+#### Threshold scripts
+These scripts explore how the networks change with the SparCC threshold. Outputs are in `4.3_Niche_Interactions/`.
+* `sparcc_threshold_ncor.R`: number of links as a function of the threshold → `figures/thresholds/Threshold_ncor.pdf`. The script draws the plot twice, first by z-score and then by score; the second (by score) overwrites the first and is the one used.
+* `sparcc_threshold_table.R`: the score threshold that keeps the N strongest links of each metacommunity, for N = 1 … 10⁶ → `thresholds/Thres_cors.tsv`.
+* `sparcc_nsamples_ncor.R`: number of links against the number of samples → `figures/thresholds/nsamples_ncor_T03.pdf` (|r| > 0.3).
+* `sparcc_overlap_vs_ncor.R`: overlap between networks against N → `figures/thresholds/ncors_overlap.pdf`.
+* `sparcc_overlap_heatmaps_ncor.R`: overlap heatmap for each N → `figures/thresholds/Heatmap_overlap_<N>.pdf`.
+
+All of them read `4.3_Niche_Interactions/correlations/Correlations.tsv`. Some also read the ASV table and the metadata, or `Thres_cors.tsv`.
+
+#### `indval_treeholes_M7.R`
+Indicator ASVs of tree holes 1 and 7 within metacommunity 7. It runs `indicspecies::multipatt` (`IndVal.g`) on the ASVs present in all the M7 samples. `Location` is the tree hole of the ASVs with p ≤ 0.05. The script then runs SIMPER, Wilcoxon tests and a heatmap for exploration; it does not save them.
+* **Input:** `1_dada2/otu_table_treeholes_dada2_renamed_clean_red.tsv`, `1_samples_properties/Metadata_singleTree_wDirich-K10.tsv`
+* **Output:** `4.3_Niche_Interactions/indicator_species/indval_M7.csv`
+
+#### `ranking_treeholes_M7.R`
+Ranks the ASVs by their summed relative abundance in TH1 and in TH7 (the samples of M7). An ASV is characteristic of a tree hole (column `ranking_TH`: `TH1`, `TH7` or `None`) when its rank differs between the two tree holes by more than 1000, or its abundance by more than 0.05. The result is written next to the IndVal result (column `indval_TH`). The exploratory sections for M10, M3 and M2 are in `src/legacy/interactions/ranking_treeholes_all_metacommunities.R`.
+* **Input:** `1_dada2/otu_table_treeholes_dada2_renamed_clean_red.tsv`, `1_samples_properties/Metadata_singleTree_wDirich-K10.tsv`, `4.3_Niche_Interactions/indicator_species/indval_M7.csv`
+* **Output:** `4.3_Niche_Interactions/indicator_species/characteristic_ASVs_M7.tsv`, `4.3_Niche_Interactions/figures/indicator_species/{DifRankingvsDifAbun_thres,Ranking_*,ranking_threshold_*}.pdf`
+
+#### `abundance_distribution_treeholes_M7.R`
+Distribution of the z-scores of the log relative abundances of all the ASVs of M7 (grey), and of the IndVal indicator ASVs of each tree hole, split by the tree hole where they were observed (Fig. 5D). It writes one figure per metacommunity.
+* **Input:** `1_dada2/otu_table_treeholes_dada2_renamed_clean_red.tsv`, `1_samples_properties/Metadata_singleTree_wDirich-K10.tsv`, `4.3_Niche_Interactions/indicator_species/indval_M7.csv`
+* **Output:** `4.3_Niche_Interactions/figures/indicator_species/Met_Hole_Dist_<K>.pdf` (Fig. 5D: K = 7) and its legend `Met_Hole_Dist_<K>_legend.pdf`
+
+#### `networks_M7.R`
+Edge lists in the functionInk format, with links |SparCC| ≥ 0.3:
+* `network_7`: the M7 network.
+* `network_7_Indval`: the M7 network restricted to the characteristic ASVs (IndVal or ranking). This is Fig. 5C.
+* `network_holes`: the TH1 and TH7 networks merged. The `type` column gives the tree hole(s) and the sign of each link.
+* **Input:** `4.3_Niche_Interactions/correlations/Correlation_zscore_thres{,_holes}.tsv`, `4.3_Niche_Interactions/indicator_species/characteristic_ASVs_M7.tsv`
+* **Output:** `4.3_Niche_Interactions/networks_M7/{network_7,network_7_Indval,network_holes}.tsv`
+
+#### `network_treeholes_membership.R`
+For each ASV of `network_holes`, adds to its functionInk cluster the tree hole(s) where it has links. Cytoscape uses this to split the network (Suppl. Fig. A).
+* **Input:** `4.3_Niche_Interactions/networks_M7/network_holes.tsv`, `4.3_Niche_Interactions/networks_M7/functionInk/network_holes/Partition-NL_Average_StopStep-580_network_holes.tsv`
+* **Output:** `4.3_Niche_Interactions/networks_M7/functionInk/network_holes/Clustering_holes.tsv`
+
+#### `networks_M7_overlap.R`
+Overlap between the M7 network and the TH1 and TH7 networks. Each cell shows the links in common.
+* **Input:** `4.3_Niche_Interactions/networks_M7/{network_7,network_7_Indval,network_holes}.tsv`, `4.3_Niche_Interactions/indicator_species/characteristic_ASVs_M7.tsv`
+* **Output:** in `4.3_Niche_Interactions/figures/networks_M7/`:
+  * `Heatmap_overlap.pdf`: all the networks (M7, its positive links, M7 restricted to the characteristic ASVs, TH1 + TH7, TH1, TH7, and the same restricted to the characteristic ASVs). As in the original script, links are counted in both orientations and the cells show links / 2. The original figure (June 2026) was made with the earlier |z| ≥ 5 networks, so its numbers differ.
+  * `Heatmap_overlap_reduced.pdf`: only the networks restricted to the characteristic ASVs.
+
+#### `legend_utils.R`
+Helpers sourced by the plotting scripts of step 4.3 to save each ggplot figure and its legend as separate PDFs (see below).
+
+#### Figure legends (step 4.3)
+All the ggplot figures of step 4.3 are saved without legend, and each legend goes to a separate PDF (`src/legend_utils.R`). Figures that share a legend write it only once; if a figure's legend differs from the shared one (for instance, a metacommunity is missing), it gets its own `<figure>_legend.pdf`. The heatmaps keep their colour key. Paths are relative to `4.3_Niche_Interactions/`.
+
+| Legend | Figures |
+|---|---|
+| `figures/legends/legend_metacommunity.pdf` | `correlation_dist` (Fig. 5B), `cumulative_distribution{,_cor}`, `thresholds/Threshold_ncor`, `thresholds/nsamples_ncor_T03` |
+| `figures/correlations/legend_metacommunity_paired.pdf` | `zscore_of_Correlations`, `Correlations_zscore_thres{,_<z>}`, `Correlations_025`, `Correlations_05` |
+| `figures/correlations/legend_treehole_paired.pdf` | `zscore_of_Correlations_holes`, `Correlations_zscore_thres_holes` |
+| `figures/thresholds/legend_metacommunity_hue.pdf` | `ncor_threshold`, `nsamples_ncor`, `nsamples_ncor_T3`, `Threshold_ncor_zscore` |
+| `figures/indicator_species/Ranking_TH_legend.pdf` | `Ranking_TH1`, `Ranking_TH7` |
+| `figures/indicator_species/Ranking_Ind_legend.pdf` | `RankingvRanking`, `DifRankingvsDifAbun` |
+| `<figure>_legend.pdf` | the rest (`Met_Hole_Dist_<K>`, `DifRankingvsDifAbun_thres`, `ncors_overlap`, `cumulative_distribution_holes`) |
+
 ### One-off and legacy scripts
 
 * `fix_treehole_morphology.R`: one-off correction of the metadata, already applied to all metadata tables: five samples from 17.02.15 (plate P1, tree holes 3, 4, 6, 7, 9) carried the morphology (`SA`, `Volume`, `Depth`, `Distance.from.previous.TH`, `Deg.North`) of another tree hole.
 * `legacy/taxonomy_betadiversity_envfit_rarefiedCLR.R`: previous envfit script (rarefied counts; the CLR of its PCoA figure was computed across samples). Replaced by J. Ramoneda's version, now `taxonomy_betadiversity_envfit.R`.
 * `legacy/phyloseq_analysis_private.R`: early exploratory phyloseq analysis from a previous project. It uses old metadata and absolute paths, and is not part of the pipeline.
+* `legacy/interactions/`: exploratory scripts of step 4.3. They were translated to English but otherwise kept as they were, so they still use the original relative paths and are not part of the pipeline:
+  * `diversity_alpha_beta_metacommunities.R`: α and β (JSD) diversity.
+  * `treeholes_sampled_same_date.R`: tree holes of the same metacommunity sampled on the same date.
+  * `associations_vs_abundance_fits.R`: number of associations against the fit to Grilli's first law.
+  * `associations_vs_ppplot.R`: number of associations against the P-P plots.
+  * `chord_diagram_location_dirichlet.R`: chord diagram of tree holes and metacommunities.
+  * `mad_treeholes_M7.R`: distribution of the mean abundances (MAD).
+  * `abundance_distribution_*`: variants of Fig. 5D.
+  * `sparcc_overlap_*_old*.R`: earlier versions of the threshold scripts.
+  * `networks_M7_overlap_all.R`: original of the full heatmap, now made by `networks_M7_overlap.R`.
+  * `select_zscore_threshold_M7.R`: histogram used to choose a z-score threshold. Only used for the z-score networks, which were discarded.
+  * `ranking_treeholes_all_metacommunities.R`: full original of `ranking_treeholes_M7.R`.
 
 ---
 
@@ -363,6 +486,27 @@ picrust2_pipeline.py -i 1_dada2/otu_table_treeholes_dada2_renamed_clean_red.biom
 
 Set the paths to these three (`idemp <-`, `cutadapt <-`, `silva.ref <-`) at the top of `dada2_treeholes.R`.
 
+#### FastSpar (step 4.3)
+Watts et al. (2019) *Bioinformatics* 35:1064, <https://github.com/scwatts/fastspar>, together with GNU `parallel`. `fastspar`, `fastspar_bootstrap` and `fastspar_pvalues` must be in your `PATH`. The commands are in `src/sparcc_run_fastspar.sh` (`make fastspar`).
+
+#### functionInk (step 4.3)
+Pascual-García & Bell (2020) *Methods Ecol. Evol.*, <https://github.com/apascualgarcia/functionInk>. It was run in `4.3_Niche_Interactions/networks_M7/functionInk/<net>/` for `<net>` = `network_7_Indval` and `network_holes`:
+```bash
+NodeSimilarity.pl -w 1 -d 0 -t 1 -f ../../<net>.tsv     # weighted, undirected, typed links
+NodeLinkage.pl -fn ../../<net>.tsv -fs Nodes-Similarities_<net>.tsv
+# step of maximum partition density: functionInk's scripts/analysis_R/nodeLinkage_analysis.R
+NodeLinkage.pl -fn ../../<net>.tsv -fs Nodes-Similarities_<net>.tsv -s step -v <step>   # 192 (network_7_Indval), 580 (network_holes)
+```
+Then run `make treehole_membership`.
+
+#### Cytoscape (step 4.3)
+The networks were drawn by hand in Cytoscape (sessions in `4.3_Niche_Interactions/networks_M7/cytoscape/`). The nodes were coloured using `indicator_species/characteristic_ASVs_M7.tsv`, `functionInk/network_holes/Clustering_holes.tsv` and `cytoscape/taxonomy.list`.
+* `Network_7_IndVal_cor03.cys` → Fig. 5C (`figures/networks_M7/network_7_Indval.pdf`)
+* `Network_holes_associations03.cys` → Suppl. Fig. A (`network_holes.pdf`)
+* `Network_holes_1_and_7.cys` → Suppl. Fig. B, the intersection network (`network_holes_as.pdf`)
+
+The panels were assembled in Inkscape; the composed figures are not in the repository.
+
 ---
 
 ## Data folders
@@ -377,7 +521,11 @@ Set the paths to these three (`idemp <-`, `cutadapt <-`, `silva.ref <-`) at the 
 | `4.1_Niche_Envir` | Composition and environment: `figures/` (figures, envfit tables, PCoA scores; `envfit_results_aitchison_pcoa_k10metadata.csv` is an older envfit table), `rda/` (`results_summary.csv`, `composition/`, `neutral_rates/`) |
 | `4.2_Niche_PiCRUST` | PICRUSt2, default reference: `*_predicted.tsv.gz`, `*_metagenome_out/`, `pathways_out/`, `KEGG_pathways_out/` (KEGG level 3 in biom, tsv and STAMP formats), `intermediate/`, `figures/` |
 | `4.2_Niche_PiCRUSTsc` | PICRUSt2 ≥ 2.6 with bacterial (`bac_*`), archaeal (`arc_*`) and combined (`combined_*`) references and more databases (CAZy, GO, BiGG, gene names); `analysis/` has the differential-pathway plots between metacommunities |
-| `4.3_Niche_Interactions` | Co-occurrence network, Cytoscape session `Net.cys` |
+| `4.3_Niche_Interactions` | `SparCC/` (one folder per metacommunity `Meta_*`, tree hole `Hole_*` and whole table: `data.tsv`, `correlations.edgelist`, FastSpar log; not committed), `correlations/` (counts of links per metacommunity; the full score tables are not committed), `thresholds/Thres_cors.tsv`, `indicator_species/` (`indval_M7.csv`: IndVal; `characteristic_ASVs_M7.tsv`: characteristic ASVs by IndVal and by ranking), `networks_M7/` (edge lists, `functionInk/` partitions (only `Partition*` and `Clustering_holes.tsv` are committed), `cytoscape/` sessions and the `taxonomy.list` used to colour them), `figures/` (one subfolder per step, plus the Cytoscape exports in `networks_M7/`).|
+
+The intermediate outputs of step 4.3 (the whole `4.3_Niche_Interactions/SparCC/` folder,
+the full tables in `4.3_Niche_Interactions/correlations/` and the functionInk files other than
+`Partition*` and `Clustering_holes.tsv`) are listed in `.gitignore` and regenerated by the pipeline.
 
 ---
 
